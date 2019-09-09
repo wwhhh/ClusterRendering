@@ -1,0 +1,40 @@
+﻿#pragma kernel FrustumCulling
+
+struct ClusterMeshData
+{
+	int index;
+	float3 position;
+	float3 extent;
+};
+
+RWStructuredBuffer<float> resultBuffer;
+RWStructuredBuffer<ClusterMeshData> clusterBuffer;
+
+#define PLANECOUNT 6
+
+float4 _FrustumPlanes[PLANECOUNT];
+
+float PlaneTest(ClusterMeshData info) {
+	float3 position = info.position;
+	float3 extent = info.extent;
+	float3 minPos = position - extent;
+	float3 maxPos = position + extent;
+	[unroll]
+	for (uint i = 0; i < 6; ++i)
+	{
+		float4 plane = _FrustumPlanes[i];
+		if (dot(plane.xyz, minPos) + plane.w < 0 && dot(plane.xyz, maxPos) + plane.w < 0)
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+
+[numthreads(64,1,1)]
+void FrustumCulling(uint3 id : SV_DispatchThreadID)
+{
+	int index = id.x;
+	ClusterMeshData data = clusterBuffer[index];
+	resultBuffer[index] = PlaneTest(data);
+}

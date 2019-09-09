@@ -1,0 +1,9 @@
+ClusterRendering/Library/metadata/
+ClusterRendering/Library/
+ClusterRendering/Temp/
+ClusterRendering/Logs/
+ClusterRendering/.vs/
+ClusterRendering/Assembly-CSharp.csproj
+ClusterRendering/Assembly-CSharp-Editor.csproj
+ClusterRendering/ClusterRendering.sln
+ClusterRendering/obj/
