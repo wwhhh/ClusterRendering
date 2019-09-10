@@ -22,8 +22,8 @@ public unsafe class ClusterRendering : MonoBehaviour
 
     private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
 
-    private NativeArray<Point> points;
-    private NativeArray<Cluster> clusters;
+    private Point[] points;
+    private Cluster[] clusters;
     private float[] results;
 
     private Vector4[] planesVector;
@@ -55,22 +55,19 @@ public unsafe class ClusterRendering : MonoBehaviour
 
     void ParseSceneData(string sceneName)
     {
-        Point[] positionArray = ClusterUtils.ReadBytes<Point>(PATH_FOLDER + PATH_VERTEX + sceneName);
-        Cluster[] clusterArray = ClusterUtils.ReadBytes<Cluster>(PATH_FOLDER + PATH_CLUSTER + sceneName);
+        points = ClusterUtils.ReadBytes<Point>(PATH_FOLDER + PATH_VERTEX + sceneName);
+        clusters = ClusterUtils.ReadBytes<Cluster>(PATH_FOLDER + PATH_CLUSTER + sceneName);
 
-        if (positionArray == null || positionArray.Length == 0 || clusterArray == null || clusterArray.Length == 0)
+        if (points == null || points.Length == 0 || clusters == null || clusters.Length == 0)
         {
             Debug.LogError("场景数据初始化失败，请检查文件路径或者二进制文件是否存在");
         }
 
         // 初始化全局参数
         if (instanceCount < 1) instanceCount = 1;
-        instanceCount = positionArray.Length / CLUSTERCLIPCOUNT + (positionArray.Length % CLUSTERCLIPCOUNT > 0 ? 1 : 0);
+        instanceCount = points.Length / CLUSTERCLIPCOUNT + (points.Length % CLUSTERCLIPCOUNT > 0 ? 1 : 0);
         vertexCount = CLUSTERCLIPCOUNT; // 顶点坐标应该是包含index信息的顶点坐标
         
-        // 从二进制转换到原生数组数据
-        points = new NativeArray<Point>(positionArray, Allocator.Persistent);
-        clusters = new NativeArray<Cluster>(clusterArray, Allocator.Persistent);
         results = new float[instanceCount];
         bounds = new Bounds(Vector3.zero, Vector3.one * 10000f);
     }
@@ -94,7 +91,7 @@ public unsafe class ClusterRendering : MonoBehaviour
     void CreateVertexBuffer()
     {
         pointsBuffer = new ComputeBuffer(instanceCount * CLUSTERCLIPCOUNT, sizeof(Point));
-        pointsBuffer.SetData(points.ToArray());
+        pointsBuffer.SetData(points);
     }
 
     void CreateResultBuffer()
@@ -111,7 +108,7 @@ public unsafe class ClusterRendering : MonoBehaviour
     void CreateClusterBuffer()
     {
         clusterBuffer = new ComputeBuffer(instanceCount, sizeof(Cluster));
-        clusterBuffer.SetData(clusters.ToArray());
+        clusterBuffer.SetData(clusters);
     }
 
     void CreateFrustumCulling()
@@ -161,8 +158,6 @@ public unsafe class ClusterRendering : MonoBehaviour
 
     void ReleaseNative()
     {
-        points.Dispose();
-        clusters.Dispose();
     }
 
     void OnGUI()

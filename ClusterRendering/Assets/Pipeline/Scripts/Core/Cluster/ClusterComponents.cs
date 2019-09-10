@@ -2,14 +2,12 @@
 
 public class ClusterComponents
 {
-
     public const int CLUSTERCLIPCOUNT = 255;
     public const string PATH_FOLDER= "Assets/BinaryInfos/";
     public const string PATH_VERTEX = "vertex_";
     public const string PATH_CLUSTER = "cluster_";
 
     public const int KERNEL_FRUSTUM_CULLING = 0;
-
 }
 
 public struct Cluster

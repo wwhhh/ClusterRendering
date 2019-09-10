@@ -260,13 +260,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 325682232}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bf3007bc717d06408e8fac5f87f6c71, type: 3}
+  m_Script: {fileID: 11500000, guid: 58d1eb5585575db41a458fb0a4842b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   enableInputCapture: 1
   holdRightMouseCapture: 0
   lookSpeed: 5
-  moveSpeed: 30
+  moveSpeed: 5
   sprintSpeed: 50
 --- !u!1 &2077820210
 GameObject:

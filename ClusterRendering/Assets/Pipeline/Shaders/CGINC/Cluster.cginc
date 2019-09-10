@@ -47,4 +47,26 @@ Point GetPoint(uint vertexID, uint instanceID)
 	return p;
 }
 
+struct clusterdata
+{
+	float4 vertex : SV_POSITION;
+	float3 wpos : TEXCOORD0;
+	float3 normal : TEXCOORD1;
+	float3 tangent : TEXCOORD2;
+	float2 uv0 : TEXCOORD3;
+};
+
+clusterdata vert_cluster(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
+{
+	Point p = GetPoint(vertexID, instanceID);
+
+	clusterdata o;
+	o.vertex = mul(UNITY_MATRIX_VP, float4(p.vertex, 1.0f));
+	o.wpos = p.vertex;
+	o.normal = p.normal;
+	o.tangent = p.tangent;
+	o.uv0 = p.uv0;
+	return o;
+}
+
 #endif
