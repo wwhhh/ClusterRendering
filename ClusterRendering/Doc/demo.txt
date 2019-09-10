@@ -1,0 +1,6 @@
+1. Deferred Lighting
+	自定义延迟渲染流程 //使用Unity的库实现的PBR，后改自己
+2. Cluster Rendering
+	场景分隔成64*4的Cluster，然后写入二进制流，然后这个固定顶点数的clusters可以完全通过Instance的方式绘制，这里使用的是IndirectDraw，可以与computer Shader配合用于一些计算
+3. Frustum Culling
+	计算出六个面以后，在computer shader中对每一个绘制的顶点进行计算和判断是否需要绘制
