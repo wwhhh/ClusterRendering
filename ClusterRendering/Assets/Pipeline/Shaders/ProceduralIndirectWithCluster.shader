@@ -2,7 +2,36 @@
 {
     Properties
     {
+		_Tint("Tint", Color) = (1, 1, 1, 1)
+		_MainTex("Albedo", 2D) = "white" {}
+
+		[NoScaleOffset] _NormalMap("Normals", 2D) = "bump" {}
+		_BumpScale("Bump Scale", Float) = 1
+
+		[NoScaleOffset] _MetallicMap("Metallic", 2D) = "white" {}
+		[Gamma] _Metallic("Metallic用于Specular与Albedo插值", Range(0, 1)) = 0
+		_Smoothness("Smoothness", Range(0, 1)) = 0.1
+
+		[NoScaleOffset] _OcclusionMap("Occlusion", 2D) = "white" {}
+		_OcclusionStrength("Occlusion Strength", Range(0, 1)) = 1
+
+		[NoScaleOffset] _EmissionMap("Emission", 2D) = "black" {}
+		_Emission("Emission", Color) = (0, 0, 0)
+
+		[NoScaleOffset] _DetailMask("Detail Mask", 2D) = "white" {}
+		_DetailTex("Detail Albedo", 2D) = "gray" {}
+		[NoScaleOffset] _DetailNormalMap("Detail Normals", 2D) = "bump" {}
+		_DetailBumpScale("Detail Bump Scale", Float) = 1
+
+		_AlphaCutoff("Alpha Cutoff", Range(0, 1)) = 0.5
     }
+
+	CGINCLUDE
+
+	#define BINORMAL_PER_FRAGMENT
+
+	ENDCG
+
     SubShader
     {
         Tags { "RenderType"="Opaque" }
@@ -12,29 +41,17 @@
         {
             CGPROGRAM
             #pragma vertex vert_cluster
-            #pragma fragment frag
+            #pragma fragment frag//frag_deferredLighting
 			#pragma target 4.5
 
-			#include "UnityCG.cginc"
-			#include "UnityDeferredLibrary.cginc"
-			#include "UnityPBSLighting.cginc"
-			#include "UnityStandardUtils.cginc"
-			#include "UnityGBuffer.cginc"
-			#include "UnityStandardBRDF.cginc"
 			#include "CGINC/Cluster.cginc"
+			//#include "CGINC/DeferredLighting.cginc"
 
-			float4x4 _InvVP;
-			float3 _CurLightDir;
-			float3 _CurLightColor;
+			float4 frag(Interpolators i) : SV_Target
+			{
+				return fixed4(0.375, 0.375, 0.375, 1);
+			}
 
-            fixed4 frag (clusterdata i) : SV_Target
-            {
-				float4 wpos = float4(i.wpos, 1);
-				float3 viewDir = normalize(_WorldSpaceCameraPos - wpos);
-				float3 eyeVec = normalize(wpos.xyz - _WorldSpaceCameraPos);
-
-                return float4(i.normal, 1);
-            }
             ENDCG
         }
     }

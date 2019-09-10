@@ -10,11 +10,7 @@ public class PipelineAssets : RenderPipelineAsset
         return new Pipeline(this);
     }
 
-    public Light directionalLight;
-    public ComputeShader frustumCulling;
-    public Camera cam;
-
-    public int instanceCount;       // Cluster数量
-    public int vertexCount;         // 顶点的数量
+    //public PipelineTargets targets;
+    //public PipelineBuffers buffers;
 
 }

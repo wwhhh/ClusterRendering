@@ -1,11 +1,16 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static PipelineComponent;
 
 public class Pipeline : RenderPipeline
 {
 
-    public PipelineAssets asset;
+    public PipelineCommandData data;
+    private PipelineAssets asset;
+    private bool bInit = false;
+
+    ClusterRendering rendering;
 
     public Pipeline(PipelineAssets asset)
     {
@@ -14,8 +19,22 @@ public class Pipeline : RenderPipeline
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
+        if (!bInit) { InitData(context); }
+
         ExecuteCamera(context, cameras);
         context.Submit();
+    }
+
+    private void InitData(ScriptableRenderContext context)
+    {
+        bInit = true;
+
+        data = new PipelineCommandData();
+        data.command = new CommandBuffer();
+        data.asset = asset;
+        data.context = context;
+
+        rendering = GameObject.FindGameObjectWithTag("GameController").GetComponent<ClusterRendering>();
     }
 
     private void ExecuteCamera(ScriptableRenderContext context, Camera[] cameras)
@@ -28,16 +47,11 @@ public class Pipeline : RenderPipeline
 
     private void Render(ScriptableRenderContext context, Camera camera)
     {
-        // Clear
         Clear(context, camera);
-        // PreRender
-        PreRender();
-        // Culling
-        Culling();
-        // PostRender
-        PostRender();
-        // OnRenderImage
-        OnRenderImage();
+
+        CommandBuffer drawCommand = new CommandBuffer();
+        rendering.Render(drawCommand);
+        context.ExecuteCommandBuffer(drawCommand);
     }
 
     private void Clear(ScriptableRenderContext context, Camera camera)
@@ -47,26 +61,4 @@ public class Pipeline : RenderPipeline
         context.ExecuteCommandBuffer(clearCommand);
     }
 
-    /// <summary>
-    /// 用于设置值
-    /// </summary>
-    private void PreRender()
-    {
-
-    }
-
-    private void Culling()
-    {
-
-    }
-
-    private void PostRender()
-    {
-
-    }
-
-    private void OnRenderImage()
-    {
-
-    }
 }

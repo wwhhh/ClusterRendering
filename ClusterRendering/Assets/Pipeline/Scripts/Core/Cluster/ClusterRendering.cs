@@ -2,6 +2,7 @@
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using static ClusterComponents;
 
@@ -38,7 +39,12 @@ public unsafe class ClusterRendering : MonoBehaviour
         CreateFrustumCulling();
     }
 
-    void Update()
+    private void Update()
+    {
+        //Render(null);
+    }
+
+    public void Render(CommandBuffer command)
     {
         float4* planes = stackalloc float4[6];
         CameraUtils.GetFrustumPlanes(cam, planes);
@@ -50,7 +56,8 @@ public unsafe class ClusterRendering : MonoBehaviour
         // 材质参数设置
         SetMaterialArgs();
         // 绘制
-        Graphics.DrawProceduralIndirect(instanceMaterial, bounds, MeshTopology.Triangles, argsBuffer);
+        //Graphics.DrawProceduralIndirect(instanceMaterial, bounds, MeshTopology.Triangles, argsBuffer);
+        command.DrawProceduralIndirect(Matrix4x4.identity, instanceMaterial, 0, MeshTopology.Triangles, argsBuffer);
     }
 
     void ParseSceneData(string sceneName)

@@ -11,4 +11,5 @@ public static class ShaderIDs
     public static readonly int ID_InvVP = Shader.PropertyToID("_InvVP");
     public static readonly int ID_DLightDir = Shader.PropertyToID("_CurLightDir");
     public static readonly int ID_DLightColor = Shader.PropertyToID("_CurLightColor");
+    public static readonly int ID_DepthTexture = Shader.PropertyToID("_DepthTexture");
 }

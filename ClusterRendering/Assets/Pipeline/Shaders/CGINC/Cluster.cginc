@@ -1,6 +1,8 @@
 ﻿#ifndef CLUSTER
 #define CLUSTER
 
+#include "Common.cginc"
+
 struct Point
 {
 	float3 vertex;
@@ -47,25 +49,24 @@ Point GetPoint(uint vertexID, uint instanceID)
 	return p;
 }
 
-struct clusterdata
-{
-	float4 vertex : SV_POSITION;
-	float3 wpos : TEXCOORD0;
-	float3 normal : TEXCOORD1;
-	float3 tangent : TEXCOORD2;
-	float2 uv0 : TEXCOORD3;
-};
-
-clusterdata vert_cluster(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
+Interpolators vert_cluster(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 {
 	Point p = GetPoint(vertexID, instanceID);
 
-	clusterdata o;
-	o.vertex = mul(UNITY_MATRIX_VP, float4(p.vertex, 1.0f));
-	o.wpos = p.vertex;
+	Interpolators o;
+	o.pos = mul(UNITY_MATRIX_VP, float4(p.vertex, 1.0f));
+	o.worldPos = p.vertex;
 	o.normal = p.normal;
+
+#if defined(BINORMAL_PER_FRAGMENT)
 	o.tangent = p.tangent;
-	o.uv0 = p.uv0;
+#else
+	o.tangent = p.tangent;
+	o.binormal = CreateBinormal(o.normal, o.tangent, v.tangent.w);
+#endif
+
+	o.uv.xy = TRANSFORM_TEX(p.uv0, _MainTex);
+
 	return o;
 }
 
