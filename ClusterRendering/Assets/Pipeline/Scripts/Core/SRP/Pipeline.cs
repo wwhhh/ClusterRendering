@@ -47,10 +47,17 @@ public class Pipeline : RenderPipeline
 
     private void Render(ScriptableRenderContext context, Camera camera)
     {
+        context.SetupCameraProperties(camera);
+
+        var filteringSettings = new FilteringSettings()
+        {
+            renderQueueRange = RenderQueueRange.opaque
+        };
+
         Clear(context, camera);
 
         CommandBuffer drawCommand = new CommandBuffer();
-        rendering.Render(drawCommand);
+        //rendering.Render(drawCommand);
         context.ExecuteCommandBuffer(drawCommand);
     }
 

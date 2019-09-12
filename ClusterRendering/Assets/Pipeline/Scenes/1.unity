@@ -130,6 +130,7 @@ GameObject:
   m_Component:
   - component: {fileID: 141627875}
   - component: {fileID: 141627876}
+  - component: {fileID: 141627877}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: GameController
@@ -160,13 +161,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 141627874}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc5e83937bfdc3744afd0d5ba8e6dc8f, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a9ed2bfeddca34fa2143a702f0cd47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  instanceMaterial: {fileID: 2100000, guid: 4071e804ea074734b8ff30fffdad41a9, type: 2}
-  directionalLight: {fileID: 2077820211}
+  asset: {fileID: 141627877}
+  target: {fileID: 0}
+  targetDepth: {fileID: 0}
+  targetGBuffer: []
+  _gBufferIDs: 
+--- !u!114 &141627877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141627874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c96fddb461ea4ce4e8076c204ae0e9fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultMaterial: {fileID: 2100000, guid: 4071e804ea074734b8ff30fffdad41a9, type: 2}
   frustumCulling: {fileID: 7200000, guid: 2bd67f8a019efc74ab180ea42a0e1ea2, type: 3}
-  cam: {fileID: 325682234}
 --- !u!1 &325682232
 GameObject:
   m_ObjectHideFlags: 0
@@ -226,12 +242,12 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: -1
+  m_RenderingPath: 3
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
-  m_AllowMSAA: 1
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
