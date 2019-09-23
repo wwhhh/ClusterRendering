@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Framework;
 using System.Collections.Generic;
+using System;
 
 public class SceneController : Singleton<SceneController>
 {
@@ -48,12 +49,19 @@ public class SceneController : Singleton<SceneController>
         }
     }
 
-    private void UnloadAll()
+    public void UnloadAll()
     {
         foreach (var key in dic.Keys)
         {
             UnloadScene(key);
         }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        UnloadAll();
     }
 
 }

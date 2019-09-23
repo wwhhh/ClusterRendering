@@ -12,4 +12,8 @@ public static class ShaderIDs
     public static readonly int ID_DLightDir = Shader.PropertyToID("_CurLightDir");
     public static readonly int ID_DLightColor = Shader.PropertyToID("_CurLightColor");
     public static readonly int ID_DepthTexture = Shader.PropertyToID("_DepthTexture");
+    public static readonly int ID_GBuffer0 = Shader.PropertyToID("_GBuffer0");
+    public static readonly int ID_GBuffer1 = Shader.PropertyToID("_GBuffer1");
+    public static readonly int ID_GBuffer2 = Shader.PropertyToID("_GBuffer2");
+    public static readonly int ID_GBuffer3 = Shader.PropertyToID("_GBuffer3");
 }

@@ -38,9 +38,9 @@ public unsafe class ClusterRendering
         CreateBuffers();
         CreateFrustumCulling();
 
-        cmd = new CommandBuffer();
+        cmd = CommandBufferPool.Get();
         cmd.DrawProceduralIndirect(Matrix4x4.identity, defaultMaterial, 0, MeshTopology.Triangles, argsBuffer);
-        cam.AddCommandBuffer(CameraEvent.BeforeImageEffects, cmd);
+        //cam.AddCommandBuffer(CameraEvent.BeforeImageEffects, cmd);
     }
 
     public void Render()
@@ -55,6 +55,7 @@ public unsafe class ClusterRendering
         // 材质参数设置
         SetMaterialArgs();
         // 绘制
+        Graphics.ExecuteCommandBuffer(cmd);
     }
 
     void ParseSceneData(string sceneName)
@@ -158,6 +159,8 @@ public unsafe class ClusterRendering
 
         if (clusterBuffer != null) clusterBuffer.Release();
         clusterBuffer = null;
+
+        cmd.Dispose();
     }
 
     void ReleaseNative()

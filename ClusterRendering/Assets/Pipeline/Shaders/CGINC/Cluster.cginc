@@ -55,6 +55,7 @@ Interpolators vert_cluster(uint vertexID : SV_VertexID, uint instanceID : SV_Ins
 
 	Interpolators o;
 	o.pos = mul(UNITY_MATRIX_VP, float4(p.vertex, 1.0f));
+	o.uv = float4(p.uv0, 0, 0);
 	o.worldPos = p.vertex;
 	o.normal = p.normal;
 
