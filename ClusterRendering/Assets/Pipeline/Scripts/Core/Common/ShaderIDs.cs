@@ -16,4 +16,5 @@ public static class ShaderIDs
     public static readonly int ID_GBuffer1 = Shader.PropertyToID("_GBuffer1");
     public static readonly int ID_GBuffer2 = Shader.PropertyToID("_GBuffer2");
     public static readonly int ID_GBuffer3 = Shader.PropertyToID("_GBuffer3");
+    public static readonly int ID_MaterialProperties= Shader.PropertyToID("_MaterialPropertiesBuffer");
 }

@@ -25,7 +25,7 @@ public unsafe class ClusterRendering
     private float[] results;
     private Vector4[] planesVector;
 
-
+    private bool enableFrustumCulling;
     private CommandBuffer cmd;
 
     public void Init(string sceneName, GraphicsPipelineAsset asset)
@@ -33,6 +33,7 @@ public unsafe class ClusterRendering
         cam = Camera.main;
         defaultMaterial = asset.defaultMaterial;
         frustumCulling = asset.frustumCulling;
+        enableFrustumCulling = asset.enableFrustumCulling;
 
         ParseSceneData(sceneName);
         CreateBuffers();
@@ -49,9 +50,12 @@ public unsafe class ClusterRendering
         CameraUtils.GetFrustumPlanes(cam, planes);
         UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref planesVector[0]), planes, 6 * sizeof(float4));
 
-        // 这个值必须不停的设置
-        frustumCulling.SetVectorArray(ShaderIDs.ID_FrustumPlanes, planesVector);
-        frustumCulling.Dispatch(KERNEL_FRUSTUM_CULLING, instanceCount, 1, 1);
+        // 视锥体裁剪
+        if (enableFrustumCulling)
+        {
+            frustumCulling.SetVectorArray(ShaderIDs.ID_FrustumPlanes, planesVector);
+            frustumCulling.Dispatch(KERNEL_FRUSTUM_CULLING, instanceCount, 1, 1);
+        }
         // 材质参数设置
         SetMaterialArgs();
         Graphics.ExecuteCommandBuffer(cmd);
@@ -59,8 +63,8 @@ public unsafe class ClusterRendering
 
     void ParseSceneData(string sceneName)
     {
-        points = ClusterUtils.ReadBytes<Point>(PATH_FOLDER + PATH_VERTEX + sceneName);
-        clusters = ClusterUtils.ReadBytes<Cluster>(PATH_FOLDER + PATH_CLUSTER + sceneName);
+        points = ClusterUtils.ReadBytes<Point>(PATH_FOLDER + "/"+ sceneName +"/" + PATH_VERTEX + sceneName);
+        clusters = ClusterUtils.ReadBytes<Cluster>(PATH_FOLDER + "/" + sceneName + "/" + PATH_CLUSTER + sceneName);
 
         if (points == null || points.Length == 0 || clusters == null || clusters.Length == 0)
         {

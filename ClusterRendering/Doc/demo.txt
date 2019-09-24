@@ -6,3 +6,7 @@
 	计算出六个面以后，在computer shader中对每一个绘制的顶点进行计算和判断是否需要绘制
 4. SRP
 	将deferred lighting改成SRP的版本，整体都迁移到自定义的管线中
+5. Unity Built-in Pipeline
+	由于19.2的SRP只有硬啃代码，所以暂时先不替换，先用built-in pipeline搭建完成，以后再替换
+6. Material Properties 支持
+	让场景中的物件支持不同的材质，所有材质的参数和纹理都由computer buffer传递到gpu中

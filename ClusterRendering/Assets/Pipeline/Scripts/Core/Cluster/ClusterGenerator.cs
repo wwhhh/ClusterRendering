@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static ClusterComponents;
@@ -11,8 +13,7 @@ using static Unity.Mathematics.math;
 
 public class ClusterGenerator : MonoBehaviour
 {
-    public ClusterMatResources res;
-    public bool Ready;
+    public ClusterResources res;
 
     [Range(100, 500)]
     public int voxelCount = 100;
@@ -22,14 +23,6 @@ public class ClusterGenerator : MonoBehaviour
     private string sceneName;
     private string resPath;
 
-    //private void Start()
-    //{
-    //    if (Ready)
-    //        Do();
-
-    //    Ready = false;
-    //}
-
     public struct CombinedModel
     {
         public NativeList<Point> allPoints;
@@ -38,10 +31,13 @@ public class ClusterGenerator : MonoBehaviour
         public VirtualMaterial vm;
     }
 
+    private void Start()
+    {
+    }
+
     [EasyButtons.Button]
     private void Do()
     {
-
         Scene scene = SceneManager.GetActiveScene();
         sceneName = scene.name.Replace("workscene_", "");
 
@@ -69,6 +65,10 @@ public class ClusterGenerator : MonoBehaviour
         ClusterUtils.CheckPath(resPath.ToString());
         ClusterUtils.WriteBytes(resPath + PATH_VERTEX + sceneName, points);
         ClusterUtils.WriteBytes(resPath + PATH_CLUSTER + sceneName, boxes);
+
+        AddSceneStreaming(model.vm);
+
+        SaveAsGameScene();
     }
 
     public CombinedModel ProcessCluster(MeshRenderer[] allRenderers, Dictionary<MeshRenderer, bool> lowLODLevels)
@@ -144,10 +144,10 @@ public class ClusterGenerator : MonoBehaviour
 
         for (int idx = 0; idx < targetMesh.subMeshCount; idx++)
         {
+            int[] triangles = targetMesh.GetTriangles(idx);
             Material mat = materials[idx];
-            int[] triangleArray = targetMesh.triangles;
             int matIndex = dict[mat];
-            foreach (var i in triangleArray)
+            foreach (var i in triangles)
             {
                 points.Add(new Point
                 {
@@ -299,37 +299,51 @@ public class ClusterGenerator : MonoBehaviour
         }
     }
 
-    private void CreateAssets(NativeList<Cluster> clusters)
+    private void AddSceneStreaming(VirtualMaterial vm)
     {
-        bool exists = false;
-        int index = 0;
-        for (int i = 0; i < res.clusterProperties.Count; i++)
+        foreach (var s in res.clusterProperties)
         {
-            if (res.clusterProperties[i].name.Equals(sceneName))
+            if (s.name == sceneName)
             {
-                exists = true;
-                index = i;
+                res.clusterProperties.Remove(s);
                 break;
             }
         }
 
-        if (exists)
+        SceneStreaming ss = new SceneStreaming();
+        ss.name = sceneName;
+        ss.vm = vm;
+
+        res.clusterProperties.Add(ss);
+    }
+
+    public void SaveAsGameScene()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        if (!scene.name.StartsWith("workscene_", StringComparison.CurrentCultureIgnoreCase))
         {
-            ClusterProperty property = res.clusterProperties[index];
-            res.clusterProperties.Remove(property);
-            property.clusterCount = clusters.Length;
-            res.clusterProperties.Add(property);
-        }
-        else
-        {
-            res.clusterProperties.Add(new ClusterProperty
-            {
-                name = sceneName,
-                clusterCount = clusters.Length
-            });
+            Debug.LogError("场景名不符合规范：workscene_XXXXX");
+            return;
         }
 
-        EditorUtility.SetDirty(res);
+        string dstScenePath = string.Concat(Path.GetDirectoryName(scene.path), "/", scene.name.Replace("workscene_", ""), ".unity");
+        if (!EditorSceneManager.SaveScene(scene, dstScenePath))
+        {
+            Debug.LogError("Failed to save scene: " + dstScenePath);
+            return;
+        }
+
+        // 删除Dynamic
+        GameObject go = GameObject.Find("ClusterRenderer");
+        if (go != null)
+            UnityEngine.Object.DestroyImmediate(go);
+
+        // 把场景加入Build setting
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+
+        // 重新打开此场景，因为删除lightingDataAsset不能立即生效
+        EditorSceneManager.OpenScene(scene.path);
     }
 
 }

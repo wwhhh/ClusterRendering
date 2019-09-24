@@ -15,11 +15,10 @@ public class GraphicsPipeline : MonoBehaviour
     private RenderBuffer[] gBuffers;
     private RenderBuffer depthBuffer;
 
-    void Start()
+    private void Awake()
     {
         InitTargetBuffers();
         SceneController.instance.SetAsset(asset);
-        SceneController.instance.LoadScene("2");
     }
 
     public void InitTargetBuffers()

@@ -8,10 +8,9 @@ using UnityEngine;
 public unsafe class VirtualMaterial
 {
 
-    List<MaterialProperties> list;
-
     #region EDITOR_UTILS
 #if UNITY_EDITOR
+    ComputeShader TextureProcess;
 
     public Dictionary<Material, int> GetMaterialsData(MeshRenderer[] allRenderers, string textureSavePath)
     {
@@ -20,12 +19,13 @@ public unsafe class VirtualMaterial
             return new float3(c.r, c.b, c.g);
         }
 
-        var dict = new Dictionary<Material, int>(allRenderers.Length);
-        allProperties = new List<MaterialProperties>(allRenderers.Length);
-        var albedoTexs = new List<Texture>(allRenderers.Length);
-        var normalTexs = new List<Texture>(allRenderers.Length);
-        var albedoDict = new Dictionary<Texture, int>(allRenderers.Length);
-        var normalDict = new Dictionary<Texture, int>(allRenderers.Length);
+        var dict = new Dictionary<Material, int>();
+        allNames = new List<string>();
+        allProperties = new List<MaterialProperties>();
+        var albedoTexs = new List<Texture>();
+        var normalTexs = new List<Texture>();
+        var albedoDict = new Dictionary<Texture, int>();
+        var normalDict = new Dictionary<Texture, int>();
         int len = 0;
 
         int GetTextureIndex(List<Texture> lst, Dictionary<Texture, int> texDict, Texture tex)
@@ -50,32 +50,35 @@ public unsafe class VirtualMaterial
             {
                 if (!dict.ContainsKey(m))
                 {
+                    allNames.Add(m.name);
+
                     dict.Add(m, len);
                     Texture albedo = m.GetTexture("_MainTex");
                     Texture normal = m.GetTexture("_BumpMap");
                     int albedoIdx = GetTextureIndex(albedoTexs, albedoDict, albedo);
                     int normalIdx = GetTextureIndex(normalTexs, normalDict, normal);
-                    allProperties.Add(new MaterialProperties
+                    MaterialProperties property = new MaterialProperties
                     {
                         _Color = ColorToVector(m.GetColor("_Color")),
                         _SmoothnessIntensity = m.GetFloat("_Glossiness"),
                         _MetallicIntensity = m.GetFloat("_Metallic"),
                         _AlbedoTex = albedoIdx,
                         _NormalTex = normalIdx
-                    });
-                }
+                    };
+                    allProperties.Add(property);
 
-                len++;
+                    len++;
+                }
             }
         }
 
+        TextureProcess = Resources.Load<ComputeShader>("TextureProcessor");
         WriteToFile(out albedoGUIDs, albedoTexs, 0, textureSavePath);
         WriteToFile(out normalGUIDs, normalTexs, 1, textureSavePath);
 
         return dict;
     }
 
-    ComputeShader TextureProcess = Resources.Load<ComputeShader>("TextureProcessor");
     private void WriteToFile(out string[] strs, List<Texture> list, int typeIndex, string path)
     {
         strs = new string[list.Count];
@@ -133,6 +136,7 @@ public unsafe class VirtualMaterial
     public string[] albedoGUIDs;
     public string[] normalGUIDs;
     public List<MaterialProperties> allProperties;
+    public List<string> allNames;
     #endregion
 
 }

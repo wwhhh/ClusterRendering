@@ -3,15 +3,6 @@
 
 #include "Common.cginc"
 
-struct Point
-{
-	float3 vertex;
-	float3 normal;
-	float4 tangent;
-	float2 uv0;
-	int materialID;
-};
-
 #if SHADER_TARGET >= 45
 StructuredBuffer<float> _ResultBuffer;
 StructuredBuffer<Point> _VertexBuffer;
@@ -67,6 +58,7 @@ Interpolators vert_cluster(uint vertexID : SV_VertexID, uint instanceID : SV_Ins
 #endif
 
 	o.uv.xy = TRANSFORM_TEX(p.uv0, _MainTex);
+	o.materialID = p.materialID;
 
 	return o;
 }

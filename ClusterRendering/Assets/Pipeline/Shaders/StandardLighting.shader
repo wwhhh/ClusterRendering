@@ -94,9 +94,6 @@
 				return color;
 			}
 
-
-
-
             ENDCG
         }
     }

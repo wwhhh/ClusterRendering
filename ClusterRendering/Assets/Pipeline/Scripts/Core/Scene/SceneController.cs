@@ -8,6 +8,8 @@ public class SceneController : Singleton<SceneController>
 
     GraphicsPipelineAsset asset;
 
+    VirtualMaterialManager matManager;
+
     public enum SceneMode
     {
         Add = 0,
@@ -19,6 +21,8 @@ public class SceneController : Singleton<SceneController>
     public void SetAsset(GraphicsPipelineAsset asset)
     {
         this.asset = asset;
+        matManager = new VirtualMaterialManager();
+        matManager.Init(asset);
     }
 
     public void LoadScene(string name, SceneMode mode = SceneMode.Only)
@@ -28,6 +32,8 @@ public class SceneController : Singleton<SceneController>
         ClusterRendering rendering = new ClusterRendering();
         rendering.Init(name, asset);
         dic.Add(name, rendering);
+
+        matManager.Load(name);
     }
 
     public void UnloadScene(string name)
@@ -38,6 +44,8 @@ public class SceneController : Singleton<SceneController>
         rendering.Dispose();
 
         dic.Remove(name);
+
+        matManager.Clear();
     }
 
     public void Render()
@@ -47,6 +55,8 @@ public class SceneController : Singleton<SceneController>
             ClusterRendering rendering = dic[key];
             rendering.Render();
         }
+
+        matManager.UpdateFrame();
     }
 
     public void UnloadAll()
@@ -55,6 +65,8 @@ public class SceneController : Singleton<SceneController>
         {
             UnloadScene(key);
         }
+
+        matManager.Dispose();
     }
 
     protected override void OnDestroy()

@@ -5,6 +5,10 @@
 #include "AutoLight.cginc"
 #include "Common.cginc"
 
+#if SHADER_TARGET >= 45
+StructuredBuffer<MaterialProperties> _MaterialPropertiesBuffer;
+#endif
+
 struct VertexData {
 	float4 vertex : POSITION;
 	float3 normal : NORMAL;
@@ -21,7 +25,9 @@ float GetAlpha(Interpolators i) {
 }
 
 float3 GetAlbedo(Interpolators i) {
-	float3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Tint.rgb;
+	MaterialProperties property = _MaterialPropertiesBuffer[i.materialID];
+	float3 albedo = property.color;
+	//float3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Tint.rgb;
 #if defined (_DETAIL_ALBEDO_MAP)
 	float3 details = tex2D(_DetailTex, i.uv.zw) * unity_ColorSpaceDouble;
 	albedo = lerp(albedo, albedo * details, GetDetailMask(i));
@@ -77,7 +83,9 @@ float GetMetallic(Interpolators i) {
 #if defined(_METALLIC_MAP)
 	return tex2D(_MetallicMap, i.uv.xy).r;
 #else
-	return _Metallic;
+	MaterialProperties property = _MaterialPropertiesBuffer[i.materialID];
+	//return _Metallic;
+	return property.metallic;
 #endif
 }
 
@@ -88,7 +96,9 @@ float GetSmoothness(Interpolators i) {
 #elif defined(_SMOOTHNESS_METALLIC) && defined(_METALLIC_MAP)
 	smoothness = tex2D(_MetallicMap, i.uv.xy).a;
 #endif
-	return smoothness * _Smoothness;
+	//return smoothness * _Smoothness;
+	MaterialProperties property = _MaterialPropertiesBuffer[i.materialID];
+	return smoothness * property.smoothness;
 }
 
 float3 GetEmission(Interpolators i) {

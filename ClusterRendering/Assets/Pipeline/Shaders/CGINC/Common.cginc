@@ -34,6 +34,25 @@ struct Interpolators {
 	float3 binormal : TEXCOORD3;
 #endif
 	float3 worldPos : TEXCOORD4;
+	nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct Point
+{
+	float3 vertex;
+	float3 normal;
+	float4 tangent;
+	float2 uv0;
+	int materialID;
+};
+
+struct MaterialProperties
+{
+	float3 color;
+	float smoothness;
+	float metallic;
+	int albedoIndex;
+	int normalIndex;
 };
 
 #endif

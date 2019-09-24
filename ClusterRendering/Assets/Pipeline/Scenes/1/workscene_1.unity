@@ -211,7 +211,7 @@ GameObject:
   - component: {fileID: 156945724}
   - component: {fileID: 156945725}
   m_Layer: 0
-  m_Name: MeshRenderer
+  m_Name: ClusterRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -245,7 +245,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   res: {fileID: 11400000, guid: c2bfec8334b351b4baef7929849f7bad, type: 2}
-  Ready: 1
   voxelCount: 100
 --- !u!1 &939685552
 GameObject:
@@ -258,6 +257,8 @@ GameObject:
   - component: {fileID: 939685555}
   - component: {fileID: 939685554}
   - component: {fileID: 939685553}
+  - component: {fileID: 939685557}
+  - component: {fileID: 939685556}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -330,6 +331,35 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 25.65, y: -27.72, z: 0}
+--- !u!114 &939685556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939685552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c96fddb461ea4ce4e8076c204ae0e9fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultMaterial: {fileID: 2100000, guid: 02294debb51fe534eb6ba114b712bf1b, type: 2}
+  frustumCulling: {fileID: 7200000, guid: 2bd67f8a019efc74ab180ea42a0e1ea2, type: 3}
+  res: {fileID: 0}
+--- !u!114 &939685557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939685552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a9ed2bfeddca34fa2143a702f0cd47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  asset: {fileID: 939685556}
+  directionLighting: {fileID: 1960021056}
 --- !u!1 &1960021053
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,6 +370,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1960021055}
   - component: {fileID: 1960021054}
+  - component: {fileID: 1960021056}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -421,3 +452,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1960021056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960021053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45f474d13c915f141843386a3b3c6056, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
