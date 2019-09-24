@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEditor;
@@ -19,6 +20,7 @@ public class ClusterGenerator : MonoBehaviour
     private NativeList<Vector3> vertexes;
     private NativeList<Cluster> clusters;
     private string sceneName;
+    private string resPath;
 
     //private void Start()
     //{
@@ -32,12 +34,13 @@ public class ClusterGenerator : MonoBehaviour
     {
         public NativeList<Point> allPoints;
         public Bounds bound;
+        public NativeList<int> allMatIndex;
+        public VirtualMaterial vm;
     }
 
     [EasyButtons.Button]
     private void Do()
     {
-        CheckPath();
 
         Scene scene = SceneManager.GetActiveScene();
         sceneName = scene.name.Replace("workscene_", "");
@@ -57,16 +60,15 @@ public class ClusterGenerator : MonoBehaviour
             }
         }
 
+        resPath = PATH_FOLDER + sceneName + "/";
+
         CombinedModel model = ProcessCluster(GetComponentsInChildren<MeshRenderer>(false), lowLevelDict);
         GetCluster(model.allPoints, model.bound, out NativeList<Cluster> boxes, out NativeList<Point> points, voxelCount);
-        ClusterUtils.WriteBytes(PATH_FOLDER + PATH_VERTEX + sceneName, points);
-        ClusterUtils.WriteBytes(PATH_FOLDER + PATH_CLUSTER + sceneName, boxes);
-    }
 
-    private void CheckPath()
-    {
-        if (!Directory.Exists(PATH_FOLDER))
-            Directory.CreateDirectory(PATH_FOLDER);
+        ClusterUtils.CheckPath(PATH_FOLDER);
+        ClusterUtils.CheckPath(resPath.ToString());
+        ClusterUtils.WriteBytes(resPath + PATH_VERTEX + sceneName, points);
+        ClusterUtils.WriteBytes(resPath + PATH_CLUSTER + sceneName, boxes);
     }
 
     public CombinedModel ProcessCluster(MeshRenderer[] allRenderers, Dictionary<MeshRenderer, bool> lowLODLevels)
@@ -90,11 +92,15 @@ public class ClusterGenerator : MonoBehaviour
         }
         sumTriangleLength = (int)(sumVertexLength * 1.5);
         NativeList<Point> points = new NativeList<Point>(sumVertexLength, Allocator.Temp);
+        NativeList<int> triangleMaterials = new NativeList<int>(sumVertexLength / 3, Allocator.Temp);
+
+        VirtualMaterial vm = new VirtualMaterial();
+        Dictionary<Material, int> Mat2Index = vm.GetMaterialsData(allRenderers, resPath);
 
         for (int i = 0; i < allFilters.Count; ++i)
         {
             Mesh mesh = allFilters[i].sharedMesh;
-            GetPoints(points, mesh, allFilters[i].transform);
+            GetPoints(points, mesh, allFilters[i].transform, allRenderers[i].sharedMaterials, Mat2Index);
         }
         float3 less = points[0].vertex;
         float3 more = points[0].vertex;
@@ -113,14 +119,17 @@ public class ClusterGenerator : MonoBehaviour
         float3 center = (less + more) / 2;
         float3 extent = more - center;
         Bounds b = new Bounds(center, extent * 2);
+
         CombinedModel md;
         md.bound = b;
         md.allPoints = points;
+        md.allMatIndex = triangleMaterials;
+        md.vm = vm;
 
         return md;
     }
 
-    public void GetPoints(NativeList<Point> points, Mesh targetMesh, Transform transform)
+    public void GetPoints(NativeList<Point> points, Mesh targetMesh, Transform transform, Material[] materials, Dictionary<Material, int> dict)
     {
         //# 长度相同时直接赋值，否则要补齐
         Vector3[] vertices = targetMesh.vertices;
@@ -133,17 +142,22 @@ public class ClusterGenerator : MonoBehaviour
             vertices[i] = transform.localToWorldMatrix.MultiplyPoint(vertices[i]);
         }
 
-        int[] triangleArray = targetMesh.triangles;
-        foreach (var i in triangleArray)
+        for (int idx = 0; idx < targetMesh.subMeshCount; idx++)
         {
-            points.Add(new Point
+            Material mat = materials[idx];
+            int[] triangleArray = targetMesh.triangles;
+            int matIndex = dict[mat];
+            foreach (var i in triangleArray)
             {
-                vertex = vertices[i],
-                normal = normals[i],
-                uv0 = uvs[i],
-                tangent = tangents[i],
-                materialID = 0
-            });
+                points.Add(new Point
+                {
+                    vertex = vertices[i],
+                    normal = normals[i],
+                    uv0 = uvs[i],
+                    tangent = tangents[i],
+                    materialID = matIndex
+                });
+            }
         }
     }
 

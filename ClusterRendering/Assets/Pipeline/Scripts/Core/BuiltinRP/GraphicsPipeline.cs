@@ -19,7 +19,7 @@ public class GraphicsPipeline : MonoBehaviour
     {
         InitTargetBuffers();
         SceneController.instance.SetAsset(asset);
-        SceneController.instance.LoadScene("1");
+        SceneController.instance.LoadScene("2");
     }
 
     public void InitTargetBuffers()

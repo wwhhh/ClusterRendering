@@ -54,7 +54,6 @@ public unsafe class ClusterRendering
         frustumCulling.Dispatch(KERNEL_FRUSTUM_CULLING, instanceCount, 1, 1);
         // 材质参数设置
         SetMaterialArgs();
-        // 绘制
         Graphics.ExecuteCommandBuffer(cmd);
     }
 

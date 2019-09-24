@@ -81,7 +81,7 @@
 				indirectLight.diffuse = 0;
 				indirectLight.specular = 0;
 
-				float4 color = UNITY_BRDF_PBS(
+				fixed4 color = UNITY_BRDF_PBS(
 					data.diffuseColor, data.specularColor, 
 					oneMinusReflectivity, data.smoothness, 
 					data.normalWorld, -eyeVec, 
@@ -93,6 +93,9 @@
 
 				return color;
 			}
+
+
+
 
             ENDCG
         }

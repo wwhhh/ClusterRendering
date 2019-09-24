@@ -187,6 +187,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1504981713932161579, guid: f788d40f23d3a2a47837459c275147f9,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 02294debb51fe534eb6ba114b712bf1b, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f788d40f23d3a2a47837459c275147f9, type: 3}
 --- !u!4 &99123346 stripped
@@ -253,7 +258,6 @@ GameObject:
   - component: {fileID: 939685555}
   - component: {fileID: 939685554}
   - component: {fileID: 939685553}
-  - component: {fileID: 939685556}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -326,23 +330,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 25.65, y: -27.72, z: 0}
---- !u!114 &939685556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 939685552}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bf3007bc717d06408e8fac5f87f6c71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableInputCapture: 1
-  holdRightMouseCapture: 0
-  lookSpeed: 5
-  moveSpeed: 5
-  sprintSpeed: 50
 --- !u!1 &1960021053
 GameObject:
   m_ObjectHideFlags: 0

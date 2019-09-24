@@ -1,0 +1,29 @@
+﻿#pragma kernel ReadPixel
+#pragma kernel ReadPixelNormal3D
+#include "UnityCG.cginc"
+RWStructuredBuffer<float4> _TextureDatas;
+Texture2D<float4> _TargetTexture; SamplerState sampler_TargetTexture;
+int _Width;
+int _Height;
+int _Offset;
+[numthreads(8, 8, 1)]
+void ReadPixel(uint3 id : SV_DispatchThreadID)
+{
+	float2 uv = (id.xy + 0.5) / float2(_Width, _Height);
+	float4 col = _TargetTexture.SampleLevel(sampler_TargetTexture, uv, 0);
+#if UNITY_UV_STARTS_AT_TOP
+	id.y = _Height - id.y - 1;
+#endif
+	_TextureDatas[id.x + id.y * _Width] = col;
+}
+
+[numthreads(8, 8, 1)]
+void ReadPixelNormal3D(uint3 id : SV_DispatchThreadID)
+{
+	float2 uv = (id.xy + 0.5) / float2(_Width, _Height);
+	float4 col = _TargetTexture.SampleLevel(sampler_TargetTexture, uv, 0);
+#if UNITY_UV_STARTS_AT_TOP
+	id.y = _Height - id.y - 1;
+#endif
+	_TextureDatas[id.x + id.y * _Width + _Offset * _Width * _Height] = float4(UnpackNormal(col), 0);
+}

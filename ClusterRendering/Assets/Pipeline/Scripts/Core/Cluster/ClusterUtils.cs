@@ -47,12 +47,27 @@ public unsafe class ClusterUtils
         File.WriteAllBytes(path, bytes);
     }
 
+    public static void WriteBytes<T>(string path, T[] data) where T : unmanaged
+    {
+        int size = data.Length * sizeof(T);
+        byte[] bytes = new byte[size];
+        UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref bytes[0]), AddressOf(ref data[0]), size);
+
+        File.WriteAllBytes(path, bytes);
+    }
+
     public static T[] ReadBytes<T>(string path) where T : unmanaged
     {
         byte[] bytes = File.ReadAllBytes(path);
         T[] datas = new T[(bytes.Length * sizeof(byte)) / sizeof(T)];
         UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref datas[0]), UnsafeUtility.AddressOf(ref bytes[0]), bytes.Length * sizeof(byte));
         return datas;
+    }
+
+    public static void CheckPath(string name)
+    {
+        if (!Directory.Exists(name))
+            Directory.CreateDirectory(name);
     }
 
 }

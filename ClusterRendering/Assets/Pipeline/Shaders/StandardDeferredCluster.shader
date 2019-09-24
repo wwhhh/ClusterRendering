@@ -26,13 +26,6 @@
 		_AlphaCutoff("Alpha Cutoff", Range(0, 1)) = 0.5
     }
 
-	CGINCLUDE
-
-	#define BINORMAL_PER_FRAGMENT
-	#define DEFERRED_PASS
-
-	ENDCG
-
     SubShader
     {
         Tags { "RenderType"="Opaque" }
@@ -44,6 +37,9 @@
             #pragma vertex vert_cluster
             #pragma fragment frag_deferredLighting
 			#pragma target 4.5
+
+			#define BINORMAL_PER_FRAGMENT
+			#define DEFERRED_PASS
 
 			#include "CGINC/Cluster.cginc"
 			#include "CGINC/DeferredRender.cginc"
