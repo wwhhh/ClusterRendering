@@ -23,9 +23,9 @@ public unsafe struct VirtualMaterialManager
     {
         ClusterResources res = _asset.res;
         SceneStreaming ss = res.GetSceneStreaming(name);
+        if (ss == null) Debug.LogError("没有取到场景资源，请检查ClusterMatResource");
         VirtualMaterial vm = ss.vm;
         _properties = vm.allProperties.ToArray();
-
         _perprotiesBuffer = new ComputeBuffer(_properties.Length, sizeof(MaterialProperties));
         _perprotiesBuffer.SetData(_properties);
     }

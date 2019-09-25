@@ -16,7 +16,7 @@ public unsafe class VirtualMaterial
     {
         float3 ColorToVector(Color c)
         {
-            return new float3(c.r, c.b, c.g);
+            return new float3(c.r, c.g, c.b);
         }
 
         var dict = new Dictionary<Material, int>();

@@ -15,7 +15,7 @@
 		#include "UnityPBSLighting.cginc"
 		#include "UnityStandardUtils.cginc"
 		#include "UnityGBuffer.cginc"
-		#include "UnityStandardBRDF.cginc"
+		#include "CGINC/StandardPBR.cginc"
 
 		struct appdata
 		{
@@ -81,12 +81,11 @@
 				indirectLight.diffuse = 0;
 				indirectLight.specular = 0;
 
-				fixed4 color = UNITY_BRDF_PBS(
+				fixed4 color = StandardPBR(
 					data.diffuseColor, data.specularColor, 
 					oneMinusReflectivity, data.smoothness, 
 					data.normalWorld, -eyeVec, 
-					light,
-					indirectLight
+					light
 				);
 
 				color.rgb += gbuffer3.rgb;

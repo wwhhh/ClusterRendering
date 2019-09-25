@@ -6,6 +6,7 @@ public class GraphicsPipelineAsset : MonoBehaviour
 {
     public bool enableFrustumCulling;
     public Material defaultMaterial;
+    public Material gammaMaterial;
     public ComputeShader frustumCulling;
     public ClusterResources res;
 }

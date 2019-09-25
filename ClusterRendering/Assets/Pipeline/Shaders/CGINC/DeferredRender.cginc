@@ -239,23 +239,10 @@ FragmentOutput frag_deferredLighting(Interpolators i)
 	output.gBuffer0.rgb = albedo;
 	output.gBuffer0.a = GetOcclusion(i);
 	output.gBuffer1.rgb = specularTint;
-	output.gBuffer1.a = GetSmoothness(i);;
+	output.gBuffer1.a = GetSmoothness(i);
 	output.gBuffer2 = float4(i.normal * 0.5 + 0.5, 1);
 	output.outEmission.rgb = GetEmission(i);
 	output.outEmission.a = 1;
-#else
-	float3 viewDir = normalize(_WorldSpaceCameraPos - i.worldPos);
-	float4 color = UNITY_BRDF_PBS(
-		albedo, specularTint,
-		oneMinusReflectivity, GetSmoothness(i),
-		i.normal, viewDir,
-		CreateLight(i), CreateIndirectLight(i, viewDir)
-	);
-	color.rgb += GetEmission(i);
-#if defined(_RENDERING_FADE) || defined(_RENDERING_TRANSPARENT)
-	color.a = alpha;
-#endif
-	output.color = color;
 #endif
 	return output;
 }

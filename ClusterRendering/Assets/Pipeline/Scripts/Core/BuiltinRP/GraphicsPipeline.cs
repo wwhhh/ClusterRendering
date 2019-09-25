@@ -68,7 +68,7 @@ public class GraphicsPipeline : MonoBehaviour
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         // 后处理
-        Graphics.Blit(targetRT, destination);
+        Graphics.Blit(targetRT, destination, asset.gammaMaterial);
     }
 
 }
