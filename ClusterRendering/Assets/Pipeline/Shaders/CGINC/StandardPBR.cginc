@@ -15,18 +15,9 @@ half4 StandardPBR(half3 diffColor, half3 specColor, half oneMinusReflectivity, h
 	half lv = saturate(dot(light.dir, viewDir));
 	half lh = saturate(dot(light.dir, halfDir));
 
-	// Diffuse:Disney Diffuse
 	half diffuseTerm = DisneyDiffuse(nv, nl, lh, roughness) * nl;
 
-	//float roughness = roughness * roughness;
-	//roughness = max(roughness, 0.002);
-	//// Specular:D(GGX)*G()*F()
-	//half V = SmithJointGGXVisibilityTerm(nl, nv, roughness);
-	//float D = GGXTerm(nh, roughness);
-	//half specularTerm = V * D * UNITY_PI;
-	
-	half3 color = diffColor * (/*light.color **/ diffuseTerm)
-		/*+ specularTerm * light.color * FresnelTerm(specColor, lh)*/;
+	half3 color = diffColor * (light.color * diffuseTerm) + diffColor * 0.02f;
 
 	return half4(color, 1);
 

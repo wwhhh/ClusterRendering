@@ -59,14 +59,14 @@ public class ClusterGenerator : MonoBehaviour
         resPath = PATH_FOLDER + sceneName + "/";
 
         CombinedModel model = ProcessCluster(GetComponentsInChildren<MeshRenderer>(false), lowLevelDict);
-        GetCluster(model.allPoints, model.bound, out NativeList<Cluster> boxes, out NativeList<Point> points, voxelCount);
+        int clusterCount = GetCluster(model.allPoints, model.bound, out NativeList<Cluster> boxes, out NativeList<Point> points, voxelCount);
 
         ClusterUtils.CheckPath(PATH_FOLDER);
         ClusterUtils.CheckPath(resPath.ToString());
         ClusterUtils.WriteBytes(resPath + PATH_VERTEX + sceneName, points);
         ClusterUtils.WriteBytes(resPath + PATH_CLUSTER + sceneName, boxes);
 
-        AddSceneStreaming(model.vm);
+        AddSceneStreaming(model.vm, clusterCount);
 
         SaveAsGameScene();
     }
@@ -197,11 +197,11 @@ public class ClusterGenerator : MonoBehaviour
         }
     }
 
-    private static void GetCluster(NativeList<Point> pointsFromMesh, Bounds bd, out NativeList<Cluster> boxes, out NativeList<Point> points, int voxelCount)
+    private static int GetCluster(NativeList<Point> pointsFromMesh, Bounds bd, out NativeList<Cluster> boxes, out NativeList<Point> points, int voxelCount)
     {
         List<Triangle> trs = GenerateTriangle(pointsFromMesh);
         Voxel[,,] voxels = GetVoxelData(trs, voxelCount, bd);
-        GetClusterFromVoxel(voxels, out boxes, out points, pointsFromMesh.Length, voxelCount);
+        return GetClusterFromVoxel(voxels, out boxes, out points, pointsFromMesh.Length, voxelCount);
     }
 
     private static List<Triangle> GenerateTriangle(NativeList<Point> points)
@@ -244,7 +244,7 @@ public class ClusterGenerator : MonoBehaviour
         return voxels;
     }
 
-    private static void GetClusterFromVoxel(Voxel[,,] voxels, out NativeList<Cluster> Clusteres, out NativeList<Point> points, int vertexCount, int voxelSize)
+    private static int GetClusterFromVoxel(Voxel[,,] voxels, out NativeList<Cluster> Clusteres, out NativeList<Point> points, int vertexCount, int voxelSize)
     {
         bool deGenerated = (vertexCount % CLUSTERCLIPCOUNT == 0);
         int clusterCount = Mathf.CeilToInt((float)vertexCount / CLUSTERCLIPCOUNT);
@@ -297,9 +297,11 @@ public class ClusterGenerator : MonoBehaviour
             };
             Clusteres.Add(cb);
         }
+
+        return clusterCount;
     }
 
-    private void AddSceneStreaming(VirtualMaterial vm)
+    private void AddSceneStreaming(VirtualMaterial vm, int clusterCount)
     {
         foreach (var s in res.clusterProperties)
         {
@@ -313,6 +315,7 @@ public class ClusterGenerator : MonoBehaviour
         SceneStreaming ss = new SceneStreaming();
         ss.name = sceneName;
         ss.vm = vm;
+        ss.clusterCount = clusterCount;
 
         res.clusterProperties.Add(ss);
     }

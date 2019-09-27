@@ -9,6 +9,7 @@ public class SceneController : Singleton<SceneController>
     GraphicsPipelineAsset asset;
 
     VirtualMaterialManager matManager;
+    ClusterFrustumCulling frustumCulling;
 
     public enum SceneMode
     {
@@ -16,56 +17,82 @@ public class SceneController : Singleton<SceneController>
         Only
     }
 
-    Dictionary<string, ClusterRendering> dic = new Dictionary<string, ClusterRendering>();
+    Dictionary<string, ClusterRendering> dicRenderer = new Dictionary<string, ClusterRendering>();
+    Dictionary<string, ClusterRendering> dicShadow = new Dictionary<string, ClusterRendering>();
 
     public void SetAsset(GraphicsPipelineAsset asset)
     {
         this.asset = asset;
         matManager = new VirtualMaterialManager();
         matManager.Init(asset);
+
+        frustumCulling = new ClusterFrustumCulling();
+        frustumCulling.Init(asset);
     }
 
     public void LoadScene(string name, SceneMode mode = SceneMode.Only)
     {
         if (mode == SceneMode.Only) UnloadAll();
 
-        ClusterRendering rendering = new ClusterRendering();
-        rendering.Init(name, asset);
-        dic.Add(name, rendering);
+        int clusterCount =  asset.res.GetClusterCount(name);
 
-        matManager.Load(name);
+        frustumCulling.LoadScene(name, clusterCount);
+        matManager.LoadScene(name);
+
+        ClusterRendering renderer = new ClusterRendering(ClusterRendering.RenderType.RENDER_DEFERRED_SCENE);
+        renderer.Init(asset);
+        renderer.LoadScene(name, clusterCount);
+        dicRenderer.Add(name, renderer);
+
+        ClusterRendering shadow = new ClusterRendering(ClusterRendering.RenderType.RENDER_SHADOW);
+        shadow.Init(asset);
+        shadow.LoadScene(name, clusterCount);
+        dicShadow.Add(name, shadow);
     }
 
-    public void UnloadScene(string name)
+    public void UnloadScene(Dictionary<string, ClusterRendering> dic, string name)
     {
         if (!dic.ContainsKey(name)) return;
+        matManager.Clear();
 
         ClusterRendering rendering = dic[name];
         rendering.Dispose();
-
         dic.Remove(name);
-
-        matManager.Clear();
+        dicShadow.Remove(name);
     }
 
-    public void Render()
+    public void Render(Camera camera)
     {
-        foreach (var key in dic.Keys)
-        {
-            ClusterRendering rendering = dic[key];
-            rendering.Render();
-        }
+        frustumCulling.Render(camera);
+        matManager.Render(camera);
 
-        matManager.UpdateFrame();
+        foreach (var key in dicRenderer.Keys)
+        {
+            ClusterRendering rendering = dicRenderer[key];
+            rendering.Render(camera);
+        }
+    }
+
+    public void RenderShadow(Camera shadowCamera)
+    {
+        foreach (var key in dicShadow.Keys)
+        {
+            ClusterRendering shadow = dicShadow[key];
+            shadow.Render(shadowCamera);
+        }
     }
 
     public void UnloadAll()
     {
-        foreach (var key in dic.Keys)
+        foreach (var key in dicRenderer.Keys)
         {
-            UnloadScene(key);
+            UnloadScene(dicRenderer, key);
         }
 
+        foreach (var key in dicShadow.Keys)
+        {
+            UnloadScene(dicShadow, key);
+        }
         matManager.Dispose();
     }
 

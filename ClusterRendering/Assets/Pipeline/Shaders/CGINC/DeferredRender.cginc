@@ -59,11 +59,6 @@ float3 GetTangentSpaceNormal(Interpolators i) {
 	return normal;
 }
 
-float3 CreateBinormal(float3 normal, float3 tangent, float binormalSign) {
-	return cross(normal, tangent.xyz) *
-		(binormalSign * unity_WorldTransformParams.w);
-}
-
 void InitializeFragmentNormal(inout Interpolators i) {
 	float3 tangentSpaceNormal = GetTangentSpaceNormal(i);
 #if defined(BINORMAL_PER_FRAGMENT)
@@ -241,8 +236,9 @@ FragmentOutput frag_deferredLighting(Interpolators i)
 	output.gBuffer1.rgb = specularTint;
 	output.gBuffer1.a = GetSmoothness(i);
 	output.gBuffer2 = float4(i.normal * 0.5 + 0.5, 1);
-	output.outEmission.rgb = GetEmission(i);
-	output.outEmission.a = 1;
+	//output.outEmission.rgb = GetEmission(i);
+	//output.outEmission.a = 1;
+	output.outEmission = i.shadowVertex.z;
 #endif
 	return output;
 }

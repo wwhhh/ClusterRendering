@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class GraphicsPipelineAsset : MonoBehaviour
 {
+
+    // 渲染参数
     public bool enableFrustumCulling;
-    public Material defaultMaterial;
-    public Material gammaMaterial;
-    public ComputeShader frustumCulling;
+    public bool enableShadow;
+
+    // 场景参数
     public ClusterResources res;
+
+    // 材质
+    public Material deferredMaterial;
+    public Material shadowMaterial;
+
+    // Compute Shader
+    public ComputeShader frustumCulling;
 }

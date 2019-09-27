@@ -39,6 +39,7 @@
 		}
 
 		float4x4 _InvVP;
+		float4x4 _ShadowMatrixVP;
 		float3 _CurLightDir;
 		float3 _CurLightColor;
 		Texture2D _GBuffer0; SamplerState sampler_GBuffer0;
@@ -87,8 +88,6 @@
 					data.normalWorld, -eyeVec, 
 					light
 				);
-
-				color.rgb += gbuffer3.rgb;
 
 				return color;
 			}

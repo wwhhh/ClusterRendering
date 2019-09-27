@@ -35,6 +35,7 @@ struct Interpolators {
 #endif
 	float3 worldPos : TEXCOORD4;
 	nointerpolation uint materialID : TEXCOORD5;
+	float4 shadowVertex : TEXCOORD6;
 };
 
 struct Point
@@ -54,5 +55,10 @@ struct MaterialProperties
 	int albedoIndex;
 	int normalIndex;
 };
+
+float3 CreateBinormal(float3 normal, float3 tangent, float binormalSign) {
+	return cross(normal, tangent.xyz) *
+		(binormalSign * unity_WorldTransformParams.w);
+}
 
 #endif

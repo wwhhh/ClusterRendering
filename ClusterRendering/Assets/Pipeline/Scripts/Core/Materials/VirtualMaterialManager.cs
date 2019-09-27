@@ -19,7 +19,7 @@ public unsafe struct VirtualMaterialManager
         _asset = asset;
     }
 
-    public void Load(string name)
+    public void LoadScene(string name)
     {
         ClusterResources res = _asset.res;
         SceneStreaming ss = res.GetSceneStreaming(name);
@@ -30,9 +30,9 @@ public unsafe struct VirtualMaterialManager
         _perprotiesBuffer.SetData(_properties);
     }
 
-    public void UpdateFrame()
+    public void Render(Camera cam)
     {
-        Material mat = _asset.defaultMaterial;
+        Material mat = _asset.deferredMaterial;
         mat.SetBuffer(ShaderIDs.ID_MaterialProperties, _perprotiesBuffer);
     }
 

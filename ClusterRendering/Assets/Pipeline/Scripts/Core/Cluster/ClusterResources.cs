@@ -19,6 +19,12 @@ public class ClusterResources : ScriptableObject
         return null;
     }
 
+    public int GetClusterCount(string name)
+    {
+        SceneStreaming ss = GetSceneStreaming(name);
+        return ss.clusterCount;
+    }
+
     #region EDITOR
 
     [MenuItem("Assets/Resources/Common/CreateScriptObject")]
