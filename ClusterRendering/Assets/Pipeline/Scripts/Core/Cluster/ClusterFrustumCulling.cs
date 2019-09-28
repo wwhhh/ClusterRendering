@@ -61,7 +61,7 @@ public unsafe class ClusterFrustumCulling : ICommand
             frustumCulling.Dispatch(KERNEL_FRUSTUM_CULLING, instanceCount, 1, 1);
         }
 
-        asset.deferredMaterial.SetBuffer(ShaderIDs.ID_ResultBuffer, resultBuffer);
+        Shader.SetGlobalBuffer(ShaderIDs.ID_ResultBuffer, resultBuffer);
     }
 
     void ParseSceneData(string sceneName)

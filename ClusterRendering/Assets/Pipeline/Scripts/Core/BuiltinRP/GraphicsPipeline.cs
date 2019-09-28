@@ -5,8 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GraphicsPipeline : MonoBehaviour
 {
-    public GraphicsLighting directionLighting;
-
     GraphicsPipelineAsset asset;
 
     private void Awake()

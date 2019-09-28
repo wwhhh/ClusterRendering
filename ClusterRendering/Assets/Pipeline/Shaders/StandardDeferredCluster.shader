@@ -46,5 +46,20 @@
 
             ENDCG
         }
+
+		Pass 
+		{
+			CGPROGRAM
+			#pragma vertex vert_cluster
+			#pragma fragment frag_deferredLighting
+			#pragma target 4.5
+
+			#define BINORMAL_PER_FRAGMENT
+
+			#include "CGINC/Cluster.cginc"
+			#include "CGINC/DeferredRender.cginc"
+
+			ENDCG
+		}
     }
 }

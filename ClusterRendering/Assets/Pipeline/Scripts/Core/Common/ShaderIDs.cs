@@ -19,5 +19,4 @@ public static class ShaderIDs
     public static readonly int ID_MaterialProperties= Shader.PropertyToID("_MaterialPropertiesBuffer");
     public static readonly int ID_Shadowmap = Shader.PropertyToID("_Shadowmap");
     public static readonly int ID_ShadowMatrixVP = Shader.PropertyToID("_ShadowMatrixVP");
-    public static readonly int ID_ShadowMatrix_INVVP = Shader.PropertyToID("_ShadowMatrix_INVVP");
 }

@@ -16,6 +16,7 @@
 		#include "UnityStandardUtils.cginc"
 		#include "UnityGBuffer.cginc"
 		#include "CGINC/StandardPBR.cginc"
+		#include "CGINC/Shadow.cginc"
 
 		struct appdata
 		{
@@ -39,7 +40,6 @@
 		}
 
 		float4x4 _InvVP;
-		float4x4 _ShadowMatrixVP;
 		float3 _CurLightDir;
 		float3 _CurLightColor;
 		Texture2D _GBuffer0; SamplerState sampler_GBuffer0;
@@ -48,7 +48,7 @@
 		Texture2D _GBuffer3; SamplerState sampler_GBuffer3;
 		TextureCube _CubeMap; SamplerState sampler_CubeMap;
 		Texture2D _DepthTexture; SamplerState sampler_DepthTexture;
-
+		
 		ENDCG
 
 		Pass
@@ -89,7 +89,10 @@
 					light
 				);
 
-				return color;
+				float4 shadowCameraWorldPos = GetShadowCameraWorldPos(worldPos);
+				float shadow = GetShadow(shadowCameraWorldPos);
+
+				return shadow;
 			}
 
             ENDCG

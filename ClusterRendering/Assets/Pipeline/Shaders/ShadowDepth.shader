@@ -2,7 +2,7 @@
 {
 	SubShader
 	{
-		Tags { "RenderType" = "Opaque" }
+		Tags { "LightMode" = "ShadowCaster" }
 		LOD 100
 
 		Pass
@@ -24,15 +24,15 @@
             {
 				Point p = GetPoint(vertexID, instanceID);
 				float4 worldPos = float4(p.vertex, 1);
-                
+
 				v2f o;
 				o.vertex = mul(_ShadowMatrixVP, worldPos);
-                return o;
+				return o;
             }
 
-			fixed4 frag(v2f i) : SV_Target
+			float4 frag(v2f i) : SV_Target
 			{
-				return 1;// i.vertex.z;
+				return 0;
             }
             ENDCG
         }

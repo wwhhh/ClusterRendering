@@ -236,9 +236,10 @@ FragmentOutput frag_deferredLighting(Interpolators i)
 	output.gBuffer1.rgb = specularTint;
 	output.gBuffer1.a = GetSmoothness(i);
 	output.gBuffer2 = float4(i.normal * 0.5 + 0.5, 1);
-	//output.outEmission.rgb = GetEmission(i);
-	//output.outEmission.a = 1;
-	output.outEmission = i.shadowVertex.z;
+	output.outEmission.rgb = GetEmission(i);
+	output.outEmission.a = 1;
+#else
+	output.color = float4(0.1, 0, 0, 1);
 #endif
 	return output;
 }

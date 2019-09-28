@@ -57,8 +57,8 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
     {
         if (!bRunning) return;
 
+        Shader.SetGlobalBuffer(ShaderIDs.ID_VertexBuffer, pointsBuffer);
         // 材质参数设置
-        asset.deferredMaterial.SetBuffer(ShaderIDs.ID_VertexBuffer, pointsBuffer);
         if (type == RenderType.RENDER_SHADOW)
         {
             if (!asset.enableShadow) return;

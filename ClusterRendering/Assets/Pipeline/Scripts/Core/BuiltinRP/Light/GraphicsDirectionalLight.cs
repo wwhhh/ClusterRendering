@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(Light))]
@@ -24,11 +25,6 @@ public class GraphicsDirectionalLight : GraphicsLighting
     private void OnEnable()
     {
         _lightingShader = Shader.Find("Deferred/StandardLighting");
-    }
-
-    private void Update()
-    {
-
     }
 
     /// <summary>

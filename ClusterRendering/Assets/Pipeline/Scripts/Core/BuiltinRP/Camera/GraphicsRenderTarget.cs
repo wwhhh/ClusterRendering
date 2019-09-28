@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Camera))]
 public class GraphicsRenderTarget : MonoBehaviour
@@ -47,8 +48,6 @@ public class GraphicsRenderTarget : MonoBehaviour
     {
         cam.depthTextureMode = DepthTextureMode.Depth;
         SetGlobalArgs(cam);
-
-        pipeline.ScenePreRender(cam);
     }
 
     private void OnPostRender()
