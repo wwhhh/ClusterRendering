@@ -65,8 +65,9 @@
 				float4 gbuffer3 = _GBuffer3.Sample(sampler_GBuffer3, i.uv);
 
 				float depth = _DepthTexture.Sample(sampler_DepthTexture, i.uv).x;
-				float4 worldPos = mul(_InvVP, float4(i.uv * 2 - 1, depth, 1));
-				worldPos /= worldPos.w;
+				float3 ndcpos = float3(i.uv * 2 - 1, depth * 2 - 1);
+				float4 worldPos = mul(_InvVP, float4(ndcpos, 1));
+				worldPos.xyz  /= worldPos.w;
 
 				float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
 
@@ -89,10 +90,17 @@
 					light
 				);
 
-				float4 shadowCameraWorldPos = GetShadowCameraWorldPos(worldPos);
-				float shadow = GetShadow(shadowCameraWorldPos);
+				float4 clipposShadow = mul(_ShadowMatrixVP, float4(worldPos.xyz, 1));
+				float3 ndcposShadow = clipposShadow.xyz / clipposShadow.w;
+				float3 uvposShadow = ndcpos * 0.5 + 0.5;
 
-				return shadow;
+				float4 shadowmap = _Shadowmap.Sample(sampler_Shadowmap, uvposShadow.xy);
+				float shadowCameraDepth = DecodeFloatRGBA(shadowmap);
+
+				float shadow = step(shadowCameraDepth, ndcpos.z);
+				float4 result = shadow * fixed4(0, 0, 0, 0) + color * (1- shadow);
+
+				return color;// float4(ndcpos, 1);
 			}
 
             ENDCG

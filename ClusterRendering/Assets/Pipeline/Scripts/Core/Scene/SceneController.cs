@@ -18,7 +18,6 @@ public class SceneController : Singleton<SceneController>
     }
 
     Dictionary<string, ClusterRendering> dicRenderer = new Dictionary<string, ClusterRendering>();
-    Dictionary<string, ClusterRendering> dicShadow = new Dictionary<string, ClusterRendering>();
 
     public void SetAsset(GraphicsPipelineAsset asset)
     {
@@ -39,15 +38,10 @@ public class SceneController : Singleton<SceneController>
         frustumCulling.LoadScene(name, clusterCount);
         matManager.LoadScene(name);
 
-        ClusterRendering renderer = new ClusterRendering(ClusterRendering.RenderType.RENDER_DEFERRED_SCENE);
+        ClusterRendering renderer = new ClusterRendering();
         renderer.Init(asset);
         renderer.LoadScene(name, clusterCount);
         dicRenderer.Add(name, renderer);
-
-        ClusterRendering shadow = new ClusterRendering(ClusterRendering.RenderType.RENDER_SHADOW);
-        shadow.Init(asset);
-        shadow.LoadScene(name, clusterCount);
-        dicShadow.Add(name, shadow);
     }
 
     public void UnloadScene(Dictionary<string, ClusterRendering> dic, string name)
@@ -58,27 +52,26 @@ public class SceneController : Singleton<SceneController>
         ClusterRendering rendering = dic[name];
         rendering.Dispose();
         dic.Remove(name);
-        dicShadow.Remove(name);
     }
 
-    public void Render(Camera camera)
+    public void Render(RenderTarget rt)
     {
-        frustumCulling.Render(camera);
-        matManager.Render(camera);
+        frustumCulling.Render(rt, ClusterRendering.RenderType.RENDER_DEFERRED_SCENE);
+        matManager.Render(rt);
 
         foreach (var key in dicRenderer.Keys)
         {
             ClusterRendering rendering = dicRenderer[key];
-            rendering.Render(camera);
+            rendering.Render(rt, ClusterRendering.RenderType.RENDER_DEFERRED_SCENE);
         }
     }
 
-    public void RenderShadow(Camera shadowCamera)
+    public void RenderShadow(RenderTarget rt)
     {
-        foreach (var key in dicShadow.Keys)
+        foreach (var key in dicRenderer.Keys)
         {
-            ClusterRendering shadow = dicShadow[key];
-            shadow.Render(shadowCamera);
+            ClusterRendering shadow = dicRenderer[key];
+            shadow.Render(rt, ClusterRendering.RenderType.RENDER_SHADOW);
         }
     }
 
@@ -89,10 +82,6 @@ public class SceneController : Singleton<SceneController>
             UnloadScene(dicRenderer, key);
         }
 
-        foreach (var key in dicShadow.Keys)
-        {
-            UnloadScene(dicShadow, key);
-        }
         matManager.Dispose();
     }
 

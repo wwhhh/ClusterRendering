@@ -1,10 +1,12 @@
-﻿Shader "Shadow/ShadowDepth"
+﻿//High Quality Character Shadow Map  
+// 32-bits depth shader
+// Native depth shader 
+
+Shader "Shadow/shadowDepth"
 {
 	SubShader
 	{
-		Tags { "LightMode" = "ShadowCaster" }
-		LOD 100
-
+		Tags { "RenderType" = "Opaque" }
 		Pass
 		{
 			CGPROGRAM
@@ -15,26 +17,27 @@
 			#include "UnityCG.cginc"
 			#include "CGINC/Cluster.cginc"
 
-			struct v2f
-			{
-				float4 vertex : SV_POSITION;
+			float4x4 _ShadowMatrixVP;
+
+			struct v2f {
+				float4 pos : SV_POSITION;
 			};
 
-            v2f vert (uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
-            {
+			v2f vert(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID) {
 				Point p = GetPoint(vertexID, instanceID);
-				float4 worldPos = float4(p.vertex, 1);
 
 				v2f o;
-				o.vertex = mul(_ShadowMatrixVP, worldPos);
+				o.pos = mul(_ShadowMatrixVP, float4(p.vertex, 1.0f));
 				return o;
-            }
+			}
 
-			float4 frag(v2f i) : SV_Target
-			{
-				return 0;
-            }
-            ENDCG
-        }
-    }
+			fixed4 frag(v2f i) : SV_Target {
+				fixed4 r = 0;
+				r = EncodeFloatRGBA(i.pos.z);
+				return r;
+			}
+		ENDCG
+
+		}
+	}
 }

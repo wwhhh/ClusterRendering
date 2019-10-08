@@ -2,86 +2,70 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-[RequireComponent(typeof(Camera))]
-public class GraphicsShadowRenderTarget : MonoBehaviour
+public class GraphicsShadowRenderTarget : RenderTarget
 {
-    Camera cam;
-    RenderTexture shadowmapRT;
-    RenderTexture shadowDepthRT;
 
     [Range(1, 4096)]
     public int resolution = 2048;
+    public bool use32BitsDepth;
 
-    private void OnEnable()
+    public RenderTargetIdentifier shadowmapIdentifier;
+    RenderTexture _shadowmapRT;
+
+    private void Start()
     {
-        cam = GetComponent<Camera>();
+        SetUpCamera();
         Resize(resolution);
+    }
+
+    private void SetUpCamera()
+    {
+        if (cam == null) cam = gameObject.AddComponent<Camera>();
+        cam.depthTextureMode = DepthTextureMode.Depth;
+        cam.orthographic = true;
+        cam.orthographicSize = 20;
+        cam.enabled = false;
+        cam.backgroundColor = Color.clear;
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.useOcclusionCulling = false;
+        cam.allowHDR = false;
+        cam.allowMSAA = false;
     }
 
     private void Resize(int resolution)
     {
-        shadowmapRT = new RenderTexture(new RenderTextureDescriptor
+        if (_shadowmapRT != null)
         {
-            width = resolution,
-            height = resolution,
-            depthBufferBits = 16,
-            colorFormat = RenderTextureFormat.Depth,
-            autoGenerateMips = false,
-            bindMS = false,
-            dimension = UnityEngine.Rendering.TextureDimension.Tex2D,
-            enableRandomWrite = false,
-            memoryless = RenderTextureMemoryless.None,
-            shadowSamplingMode = UnityEngine.Rendering.ShadowSamplingMode.RawDepth,
-            msaaSamples = 1,
-            sRGB = false,
-            useMipMap = false,
-            volumeDepth = 4,
-            vrUsage = VRTextureUsage.None
-        });
+            RenderTexture.ReleaseTemporary(_shadowmapRT);
+            _shadowmapRT = null;
+        }
 
-        shadowDepthRT = new RenderTexture(new RenderTextureDescriptor
-        {
-            width = resolution,
-            height = resolution,
-            depthBufferBits = 16,
-            colorFormat = RenderTextureFormat.Shadowmap,
-            autoGenerateMips = false,
-            bindMS = false,
-            dimension = UnityEngine.Rendering.TextureDimension.Tex2D,
-            enableRandomWrite = false,
-            memoryless = RenderTextureMemoryless.None,
-            shadowSamplingMode = UnityEngine.Rendering.ShadowSamplingMode.RawDepth,
-            msaaSamples = 1,
-            sRGB = false,
-            useMipMap = false,
-            volumeDepth = 4,
-            vrUsage = VRTextureUsage.None
-        });
+        _shadowmapRT = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.ARGB32);
+        _shadowmapRT.filterMode = FilterMode.Point;
+        _shadowmapRT.autoGenerateMips = false;
+        shadowmapIdentifier = new RenderTargetIdentifier(_shadowmapRT);
+
+        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap, _shadowmapRT);
+        Shader.SetGlobalInt(ShaderIDs.ID_ShadowmapSize, resolution);
     }
 
-    private void OnPreRender()
+    private void SetCameraArgs()
     {
-        cam.depthTextureMode = DepthTextureMode.Depth;
-
         Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
         Matrix4x4 vp = proj * cam.worldToCameraMatrix;
-
         Shader.SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVP, vp);
-        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap, shadowDepthRT);
     }
 
-    private void OnPostRender()
+    private void LateUpdate()
     {
-        Graphics.SetRenderTarget(shadowDepthRT, 0, CubemapFace.Unknown, 16);
-        GL.Clear(true, true, Color.black);
-
-        SceneController.instance.RenderShadow(cam);
+        SetCameraArgs();
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    private void Update()
     {
-        Graphics.Blit(shadowDepthRT, destination);
+        SceneController.instance.RenderShadow(this);
     }
 
 }

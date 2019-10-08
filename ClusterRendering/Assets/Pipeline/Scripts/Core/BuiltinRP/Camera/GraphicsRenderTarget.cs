@@ -2,19 +2,18 @@
 using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Camera))]
-public class GraphicsRenderTarget : MonoBehaviour
+public class GraphicsRenderTarget : RenderTarget
 {
 
     public GraphicsPipeline pipeline;
     public GraphicsLighting directionLighting;
 
-    Camera cam;
+    public RenderTargetIdentifier[] gBufferIdentifier;
+    public RenderTargetIdentifier depthIdentifier;
+
     RenderTexture targetRT;
     RenderTexture targetDepthRT;
     RenderTexture[] targetGBufferRT;
-
-    RenderBuffer[] gBuffers;
-    RenderBuffer depthBuffer;
 
     private void OnEnable()
     {
@@ -34,28 +33,33 @@ public class GraphicsRenderTarget : MonoBehaviour
             new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear)
         };
 
-        gBuffers = new RenderBuffer[targetGBufferRT.Length];
+        gBufferIdentifier = new RenderTargetIdentifier[targetGBufferRT.Length];
         for (int i = 0; i < targetGBufferRT.Length; i++)
         {
-            gBuffers[i] = targetGBufferRT[i].colorBuffer;
+            gBufferIdentifier[i] = new RenderTargetIdentifier(targetGBufferRT[i]);
         }
 
-        depthBuffer = new RenderBuffer();
-        depthBuffer = targetDepthRT.depthBuffer;
+        depthIdentifier = new RenderTargetIdentifier(targetDepthRT);
+
+        cam.depthTextureMode = DepthTextureMode.Depth;
+        // 全局深度图
+        Shader.SetGlobalTexture(ShaderIDs.ID_DepthTexture, targetDepthRT);
+        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer0, targetGBufferRT[0]);
+        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer1, targetGBufferRT[1]);
+        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer2, targetGBufferRT[2]);
+        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer3, targetGBufferRT[3]);
     }
 
-    private void OnPreRender()
+    private void LateUpdate()
     {
-        cam.depthTextureMode = DepthTextureMode.Depth;
         SetGlobalArgs(cam);
     }
 
-    private void OnPostRender()
+    private void Update()
     {
-        Graphics.SetRenderTarget(gBuffers, depthBuffer);
         GL.Clear(true, true, Color.black);
 
-        SceneController.instance.Render(cam);
+        SceneController.instance.Render(this);
         directionLighting.Render(targetRT);
     }
 
@@ -70,14 +74,7 @@ public class GraphicsRenderTarget : MonoBehaviour
         Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
         Matrix4x4 vp = proj * cam.worldToCameraMatrix;
         Matrix4x4 invvp = vp.inverse;
-
         Shader.SetGlobalMatrix(ShaderIDs.ID_InvVP, invvp);
-        // 全局深度图
-        Shader.SetGlobalTexture(ShaderIDs.ID_DepthTexture, targetDepthRT);
-        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer0, targetGBufferRT[0]);
-        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer1, targetGBufferRT[1]);
-        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer2, targetGBufferRT[2]);
-        Shader.SetGlobalTexture(ShaderIDs.ID_GBuffer3, targetGBufferRT[3]);
     }
 
 }

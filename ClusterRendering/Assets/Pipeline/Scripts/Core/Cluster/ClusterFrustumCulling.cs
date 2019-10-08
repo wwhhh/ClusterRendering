@@ -2,6 +2,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 using static ClusterComponents;
+using static ClusterRendering;
 
 public unsafe class ClusterFrustumCulling : ICommand
 {
@@ -46,10 +47,11 @@ public unsafe class ClusterFrustumCulling : ICommand
         frustumCulling = asset.frustumCulling;
     }
 
-    public override void Render(Camera camera)
+    public override void Render(RenderTarget rt, RenderType type)
     {
         if (!bRunning) return;
 
+        Camera camera = rt.cam;
         float4* planes = stackalloc float4[6];
         CameraUtils.GetFrustumPlanes(camera, planes);
         UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref planesVector[0]), planes, 6 * sizeof(float4));

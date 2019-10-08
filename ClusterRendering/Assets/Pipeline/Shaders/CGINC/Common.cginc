@@ -35,7 +35,6 @@ struct Interpolators {
 #endif
 	float3 worldPos : TEXCOORD4;
 	nointerpolation uint materialID : TEXCOORD5;
-	float4 shadowVertex : TEXCOORD6;
 };
 
 struct Point

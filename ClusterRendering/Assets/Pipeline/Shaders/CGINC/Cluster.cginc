@@ -8,8 +8,6 @@ StructuredBuffer<float> _ResultBuffer;
 StructuredBuffer<Point> _VertexBuffer;
 #endif
 
-float4x4 _ShadowMatrixVP;
-
 float GetCullResult(uint instanceID)
 {
 #if SHADER_TARGET >= 45
@@ -61,7 +59,6 @@ Interpolators vert_cluster(uint vertexID : SV_VertexID, uint instanceID : SV_Ins
 
 	o.uv.xy = TRANSFORM_TEX(p.uv0, _MainTex);
 	o.materialID = p.materialID;
-	o.shadowVertex = mul(_ShadowMatrixVP, p.vertex);
 
 	return o;
 }

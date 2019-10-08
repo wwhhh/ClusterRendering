@@ -18,4 +18,13 @@ public class GraphicsPipelineAsset : MonoBehaviour
 
     // Compute Shader
     public ComputeShader frustumCulling;
+
+    // RenderTexture
+    public RenderTexture targetRT;
+    public RenderTexture targetDepthRT;
+    public RenderTexture[] targetGBufferRT;
+
+    // RenderBuffer
+    public RenderBuffer[] gBuffers;
+    public RenderBuffer depthBuffer;
 }

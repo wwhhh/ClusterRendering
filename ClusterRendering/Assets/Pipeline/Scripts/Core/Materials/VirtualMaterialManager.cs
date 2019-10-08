@@ -30,7 +30,7 @@ public unsafe struct VirtualMaterialManager
         _perprotiesBuffer.SetData(_properties);
     }
 
-    public void Render(Camera cam)
+    public void Render(RenderTarget rt)
     {
         Material mat = _asset.deferredMaterial;
         mat.SetBuffer(ShaderIDs.ID_MaterialProperties, _perprotiesBuffer);

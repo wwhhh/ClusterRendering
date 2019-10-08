@@ -55,10 +55,6 @@ public class Pipeline : RenderPipeline
         };
 
         Clear(context, camera);
-
-        CommandBuffer drawCommand = new CommandBuffer();
-        //rendering.Render(drawCommand);
-        context.ExecuteCommandBuffer(drawCommand);
     }
 
     private void Clear(ScriptableRenderContext context, Camera camera)
