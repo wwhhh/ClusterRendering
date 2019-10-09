@@ -4,15 +4,24 @@ using UnityEngine.Rendering;
 public class GraphicsShadowRenderTarget : RenderTarget
 {
 
+    public bool debug = true;
+    public bool use32BitsDepth;
+    public bool autoFixedFrustum = true;
+
     [Range(1, 4096)]
     public int resolution = 2048;
-    public bool use32BitsDepth;
-
+    
     // 用于计算阴影相机位置的远裁剪面位置
     [Range(0, 1000)]
     public int farClipShadowDistance = 50;
-    public GraphicsDirectionalLight mainLight;
 
+    [Range(0, 0.1f)]
+    public float shadowBias = 0.01f;
+
+    [Range(0, 1f)]
+    public float shadowSoftValue = 1f;
+
+    public GraphicsDirectionalLight mainLight;
     public RenderTargetIdentifier shadowmapIdentifier;
     RenderTexture _shadowmapRT;
 
@@ -49,6 +58,9 @@ public class GraphicsShadowRenderTarget : RenderTarget
         shadowmapIdentifier = new RenderTargetIdentifier(_shadowmapRT);
 
         Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap, _shadowmapRT);
+        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowBias, shadowBias);
+        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowSoftValue, shadowSoftValue);
+        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowmapSize, resolution);
     }
 
     private void SetTransform()
@@ -99,17 +111,32 @@ public class GraphicsShadowRenderTarget : RenderTarget
     private void SetCameraArgs()
     {
         // 自动适应相机位置
-        SetTransform();
+        if (autoFixedFrustum) SetTransform();
 
-        Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
+        //Matrix4x4 proj = GraphicsUtils.GetGPUProjectionMatrix(cam.projectionMatrix, false, true);        
+        Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
         Matrix4x4 vp = proj * cam.worldToCameraMatrix;
+        Shader.SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVPRT, vp);
+
+        proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
+        vp = proj * cam.worldToCameraMatrix;
         Shader.SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVP, vp);
+
+        if (debug)
+        {
+            Shader.SetGlobalFloat(ShaderIDs.ID_ShadowBias, shadowBias);
+            Shader.SetGlobalFloat(ShaderIDs.ID_ShadowSoftValue, shadowSoftValue);
+        }
     }
 
     private void Update()
     {
-        SetCameraArgs();
         SceneController.instance.RenderShadow(this);
+    }
+
+    private void LateUpdate()
+    {
+        SetCameraArgs();
     }
 
 }

@@ -16,7 +16,7 @@
 		#include "UnityStandardUtils.cginc"
 		#include "UnityGBuffer.cginc"
 		#include "CGINC/StandardPBR.cginc"
-		#include "CGINC/Shadow.cginc"
+		#include "CGINC/DirLightShadow.cginc"
 
 		struct appdata
 		{
@@ -46,7 +46,6 @@
 		Texture2D _GBuffer1; SamplerState sampler_GBuffer1;
 		Texture2D _GBuffer2; SamplerState sampler_GBuffer2;
 		Texture2D _GBuffer3; SamplerState sampler_GBuffer3;
-		TextureCube _CubeMap; SamplerState sampler_CubeMap;
 		Texture2D _DepthTexture; SamplerState sampler_DepthTexture;
 		
 		ENDCG
@@ -65,11 +64,13 @@
 				float4 gbuffer3 = _GBuffer3.Sample(sampler_GBuffer3, i.uv);
 
 				float depth = _DepthTexture.Sample(sampler_DepthTexture, i.uv).x;
-				float3 ndcpos = float3(i.uv * 2 - 1, depth * 2 - 1);
-				float4 worldPos = mul(_InvVP, float4(ndcpos, 1));
-				worldPos.xyz  /= worldPos.w;
-
-				float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
+#ifdef SHADER_API_D3D11
+				float4 ndcpos = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, depth, 1);
+#else
+				float4 ndcpos = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, depth * 2 - 1, 1);
+#endif
+				float4 worldPos = mul(_InvVP, ndcpos);
+				//worldPos.xyz  /= worldPos.w;
 
 				UnityStandardData data = UnityStandardDataFromGbuffer(gbuffer0, gbuffer1, gbuffer2);
 				float3 eyeVec = normalize(worldPos.xyz - _WorldSpaceCameraPos);
@@ -90,17 +91,8 @@
 					light
 				);
 
-				float4 clipposShadow = mul(_ShadowMatrixVP, float4(worldPos.xyz, 1));
-				float3 ndcposShadow = clipposShadow.xyz / clipposShadow.w;
-				float3 uvposShadow = ndcpos * 0.5 + 0.5;
-
-				float4 shadowmap = _Shadowmap.Sample(sampler_Shadowmap, uvposShadow.xy);
-				float shadowCameraDepth = DecodeFloatRGBA(shadowmap);
-
-				float shadow = step(shadowCameraDepth, ndcpos.z);
-				float4 result = shadow * fixed4(0, 0, 0, 0) + color * (1- shadow);
-
-				return color;// float4(ndcpos, 1);
+				float atten = GetDirLightShadow(worldPos);
+				return color* (1 - atten);
 			}
 
             ENDCG

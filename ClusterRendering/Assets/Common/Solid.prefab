@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7002941088626890800}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 40.86451, y: -29.77007, z: 3.4495513}
+  m_LocalRotation: {x: 0.41871402, y: 0.34112492, z: -0.17343701, w: 0.82354844}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7002941089899526597}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 53.9, y: 45, z: 0}
 --- !u!108 &7002941088626890801
 Light:
   m_ObjectHideFlags: 0
@@ -166,9 +166,6 @@ MonoBehaviour:
   deferredMaterial: {fileID: 2100000, guid: 001aec8770b8c2b4ca06767db2714cc9, type: 2}
   shadowMaterial: {fileID: 2100000, guid: 3bea86592816bd242bd676029f94a2a3, type: 2}
   frustumCulling: {fileID: 7200000, guid: 2bd67f8a019efc74ab180ea42a0e1ea2, type: 3}
-  targetRT: {fileID: 0}
-  targetDepthRT: {fileID: 0}
-  targetGBufferRT: []
 --- !u!1 &7002941089347321857
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,13 +350,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7002941089629179658}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalRotation: {x: 0.41871402, y: 0.34112492, z: -0.17343701, w: 0.82354844}
+  m_LocalPosition: {x: 0, y: 9.68, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7002941089899526597}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 53.9, y: 45, z: 0}
 --- !u!114 &7002941089629179668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,6 +371,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resolution: 1024
   use32BitsDepth: 1
+  farClipShadowDistance: 50
+  mainLight: {fileID: 7002941088626890803}
 --- !u!1 &7002941089899526596
 GameObject:
   m_ObjectHideFlags: 0

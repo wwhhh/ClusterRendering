@@ -50,4 +50,9 @@ public class GraphicsDirectionalLight : GraphicsLighting
 
     }
 
+    private void Update()
+    {
+        
+    }
+
 }

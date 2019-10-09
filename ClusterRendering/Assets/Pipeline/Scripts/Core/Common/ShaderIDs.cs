@@ -20,4 +20,7 @@ public static class ShaderIDs
     public static readonly int ID_Shadowmap = Shader.PropertyToID("_Shadowmap");
     public static readonly int ID_ShadowmapSize = Shader.PropertyToID("_ShadowmapSize");
     public static readonly int ID_ShadowMatrixVP = Shader.PropertyToID("_ShadowMatrixVP");
+    public static readonly int ID_ShadowMatrixVPRT = Shader.PropertyToID("_ShadowMatrixVPRT");
+    public static readonly int ID_ShadowBias = Shader.PropertyToID("_ShadowBias");
+    public static readonly int ID_ShadowSoftValue = Shader.PropertyToID("_ShadowSoftValue");
 }
