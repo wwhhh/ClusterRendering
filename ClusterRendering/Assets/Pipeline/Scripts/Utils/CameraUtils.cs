@@ -39,6 +39,22 @@ public unsafe class CameraUtils
         corners[3] = farPoint + upVec + rightVec;
     }
 
+    public static void GetFrustumCorner(Camera camera, float distance, Vector3[] corners)
+    {
+        Transform trs = camera.transform;
+
+        float fov = Mathf.Deg2Rad * camera.fieldOfView * 0.5f;
+        float upLength = distance * tan(fov);
+        float rightLength = upLength * camera.aspect;
+        float3 farPoint = trs.position + distance * trs.forward;
+        float3 upVec = upLength * trs.up;
+        float3 rightVec = rightLength * trs.right;
+        corners[0] = farPoint - upVec - rightVec;
+        corners[1] = farPoint - upVec + rightVec;
+        corners[2] = farPoint + upVec - rightVec;
+        corners[3] = farPoint + upVec + rightVec;
+    }
+
     public static void GetFrustumCorner(Camera camera, float3* corners)
     {
         float fov = tan(Mathf.Deg2Rad * camera.fieldOfView * 0.5f);

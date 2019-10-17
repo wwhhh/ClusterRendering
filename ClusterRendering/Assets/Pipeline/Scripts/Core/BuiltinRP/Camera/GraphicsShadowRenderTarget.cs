@@ -3,140 +3,188 @@ using UnityEngine.Rendering;
 
 public class GraphicsShadowRenderTarget : RenderTarget
 {
+    //[System.NonSerialized]
+    //public const int CASCADED_SHADOW_COUNT = 4;
 
-    public bool debug = true;
-    public bool use32BitsDepth;
-    public bool autoFixedFrustum = true;
+    //public bool debug = true;
+    //public bool autoFixedFrustum = true;
 
-    [Range(1, 4096)]
-    public int resolution = 2048;
-    
-    // 用于计算阴影相机位置的远裁剪面位置
-    [Range(0, 1000)]
-    public int farClipShadowDistance = 50;
+    //public OrthoCam[] orthoCamArray;
 
-    [Range(0, 0.1f)]
-    public float shadowBias = 0.01f;
+    //[Range(1, 4096)]
+    //public int resolution = 2048;
 
-    [Range(0, 1f)]
-    public float shadowSoftValue = 1f;
+    //// 用于计算阴影相机位置的远裁剪面位置
+    //[Range(0, 1000)]
+    //public float farClipShadowDistance = 50;
 
-    public GraphicsDirectionalLight mainLight;
-    public RenderTargetIdentifier shadowmapIdentifier;
-    RenderTexture _shadowmapRT;
+    //[Range(0, 0.1f)]
+    //public float shadowBias = 0.01f;
 
-    private void Start()
-    {
-        SetUpCamera();
-        Resize(resolution);
-    }
+    //[Range(0, 1f)]
+    //public float shadowSoftValue = 1f;
 
-    private void SetUpCamera()
-    {
-        if (cam == null) cam = gameObject.AddComponent<Camera>();
-        cam.depthTextureMode = DepthTextureMode.Depth;
-        cam.orthographic = true;
-        cam.enabled = false;
-        cam.backgroundColor = Color.clear;
-        cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.useOcclusionCulling = false;
-        cam.allowHDR = false;
-        cam.allowMSAA = false;
-    }
+    //public GraphicsDirectionalLight mainLight;
 
-    private void Resize(int resolution)
-    {
-        if (_shadowmapRT != null)
-        {
-            RenderTexture.ReleaseTemporary(_shadowmapRT);
-            _shadowmapRT = null;
-        }
+    //[System.NonSerialized]
+    //public RenderTexture shadowmapRT;
 
-        _shadowmapRT = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.ARGB32);
-        _shadowmapRT.filterMode = FilterMode.Point;
-        _shadowmapRT.autoGenerateMips = false;
-        shadowmapIdentifier = new RenderTargetIdentifier(_shadowmapRT);
+    //private void Start()
+    //{
+    //    SetUpCamera();
+    //    Resize(resolution);
+    //}
 
-        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap, _shadowmapRT);
-        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowBias, shadowBias);
-        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowSoftValue, shadowSoftValue);
-        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowmapSize, resolution);
-    }
+    //private void SetUpCamera()
+    //{
+    //    if (cam == null) cam = gameObject.AddComponent<Camera>();
+    //    cam.depthTextureMode = DepthTextureMode.Depth;
+    //    cam.orthographic = true;
+    //    cam.enabled = false;
+    //    cam.backgroundColor = Color.clear;
+    //    cam.clearFlags = CameraClearFlags.SolidColor;
+    //    cam.useOcclusionCulling = false;
+    //    cam.allowHDR = false;
+    //    cam.allowMSAA = false;
 
-    private void SetTransform()
-    {
-        Camera camera = Camera.main;
+    //    orthoCamArray = new OrthoCam[4];
+    //    for (int i = 0; i < orthoCamArray.Length; i++)
+    //    {
+    //        orthoCamArray[i] = new OrthoCam();
+    //    }
+    //}
 
-        Vector3[] nearCorners = new Vector3[4];
-        Vector3[] farCorners = new Vector3[4];
-        camera.CalculateFrustumCorners(camera.rect, camera.nearClipPlane, Camera.MonoOrStereoscopicEye.Mono, nearCorners);
-        camera.CalculateFrustumCorners(camera.rect, farClipShadowDistance, Camera.MonoOrStereoscopicEye.Mono, farCorners);
+    //private void Resize(int resolution)
+    //{
+    //    if (shadowmapRT != null)
+    //    {
+    //        RenderTexture.ReleaseTemporary(shadowmapRT);
+    //        shadowmapRT = null;
+    //    }
 
-        Vector3 average = Vector3.zero;
+    //    shadowmapRT = new RenderTexture(new RenderTextureDescriptor
+    //    {
+    //        width = resolution,
+    //        height = resolution,
+    //        depthBufferBits = 16,
+    //        colorFormat = RenderTextureFormat.Shadowmap,
+    //        autoGenerateMips = false,
+    //        bindMS = false,
+    //        dimension = TextureDimension.Tex2DArray,
+    //        enableRandomWrite = false,
+    //        memoryless = RenderTextureMemoryless.None,
+    //        shadowSamplingMode = UnityEngine.Rendering.ShadowSamplingMode.RawDepth,
+    //        msaaSamples = 1,
+    //        sRGB = false,
+    //        useMipMap = false,
+    //        volumeDepth = 4,
+    //        vrUsage = VRTextureUsage.None
+    //    });
+    //    shadowmapRT.filterMode = FilterMode.Bilinear;
+    //    shadowmapRT.autoGenerateMips = false;
 
-        for (int i = 0; i < 4; i++)
-        {
-            average += nearCorners[i];
-            average += farCorners[i];
-        }
+    //    Shader.SetGlobalFloat(ShaderIDs.ID_ShadowBias, shadowBias);
+    //    Shader.SetGlobalFloat(ShaderIDs.ID_ShadowSoftValue, shadowSoftValue);
+    //    Shader.SetGlobalFloat(ShaderIDs.ID_ShadowmapSize, resolution);
+    //    Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap, shadowmapRT);
 
-        average /= 8;
+    //}
 
-        float range = 0;
-        for (int i = 0; i < 4; i++)
-        {
-            float distance = Vector3.Distance(average, nearCorners[i]);
-            if (range < distance)
-            {
-                range = distance;
-            }
+    //private void SetTransform()
+    //{
+    //    Camera camera = Camera.main;
 
-            distance = Vector3.Distance(average, farCorners[i]);
-            if (range < distance)
-            {
-                range = distance;
-            }
-        }
+    //    Vector3[] nearCorners = new Vector3[4];
+    //    Vector3[] farCorners = new Vector3[4];
 
-        cam.orthographicSize = range;
-        cam.nearClipPlane = 0;
-        cam.farClipPlane = farClipShadowDistance;
+    //    CameraUtils.GetFrustumCorner(camera, camera.nearClipPlane, nearCorners);
+    //    CameraUtils.GetFrustumCorner(camera, farClipShadowDistance, farCorners);
 
-        Vector3 targetPosition = average - transform.forward * farClipShadowDistance * 0.5f;
-        transform.position = targetPosition;
-        transform.rotation = mainLight.transform.rotation;
-        Shader.SetGlobalFloat(ShaderIDs.ID_ShadowmapSize, range);
-    }
+    //    Vector3 average = Vector3.zero;
 
-    private void SetCameraArgs()
-    {
-        // 自动适应相机位置
-        if (autoFixedFrustum) SetTransform();
+    //    for (int i = 0; i < 4; i++)
+    //    {
+    //        average += nearCorners[i];
+    //        average += farCorners[i];
+    //    }
 
-        //Matrix4x4 proj = GraphicsUtils.GetGPUProjectionMatrix(cam.projectionMatrix, false, true);        
-        Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
-        Matrix4x4 vp = proj * cam.worldToCameraMatrix;
-        Shader.SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVPRT, vp);
+    //    average /= 8;
 
-        proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
-        vp = proj * cam.worldToCameraMatrix;
-        Shader.SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVP, vp);
+    //    float range = 0;
+    //    for (int i = 0; i < 4; i++)
+    //    {
+    //        float distance = Vector3.Distance(average, nearCorners[i]);
+    //        if (range < distance)
+    //        {
+    //            range = distance;
+    //        }
 
-        if (debug)
-        {
-            Shader.SetGlobalFloat(ShaderIDs.ID_ShadowBias, shadowBias);
-            Shader.SetGlobalFloat(ShaderIDs.ID_ShadowSoftValue, shadowSoftValue);
-        }
-    }
+    //        distance = Vector3.Distance(average, farCorners[i]);
+    //        if (range < distance)
+    //        {
+    //            range = distance;
+    //        }
+    //    }
 
-    private void Update()
-    {
-        SceneController.instance.RenderShadow(this);
-    }
+    //    cam.orthographicSize = range;
+    //    cam.nearClipPlane = 0;
+    //    cam.farClipPlane = farClipShadowDistance;
+    //    cam.rect = new Rect(0, 0, 0.5f, 0.5f);
 
-    private void LateUpdate()
-    {
-        SetCameraArgs();
-    }
+    //    Vector3 targetPosition = average - transform.forward * farClipShadowDistance * 0.5f;
+    //    transform.rotation = mainLight.transform.rotation;
+    //    Shader.SetGlobalFloat(ShaderIDs.ID_ShadowmapSize, range);
+
+    //    if (ShadowMatrixVP == Matrix4x4.identity)
+    //    {
+    //        transform.position = targetPosition;
+    //    }
+    //    else
+    //    {
+    //        Matrix4x4 invShadowVP = ShadowMatrixVP.inverse;
+
+    //        Vector3 ndcPos = ShadowMatrixVP.MultiplyPoint(targetPosition);
+    //        Vector2 uv = new Vector2(ndcPos.x, ndcPos.y) * 0.5f + Vector2.one * 0.5f;
+    //        uv.x = (int)(uv.x * resolution + 0.5);
+    //        uv.y = (int)(uv.y * resolution + 0.5);
+    //        uv /= resolution;
+    //        uv = uv * 2f - Vector2.one;
+    //        ndcPos = new Vector3(uv.x, uv.y, ndcPos.z);
+
+    //        targetPosition = invShadowVP.MultiplyPoint(ndcPos);
+    //        transform.position = targetPosition;
+    //    }
+    //}
+
+    //private Matrix4x4 ShadowMatrixVP = Matrix4x4.identity;
+    //private Matrix4x4 ShadowMatrixVP_RT = Matrix4x4.identity;
+    //private void SetCameraArgs()
+    //{
+    //    // 自动适应相机位置
+    //    if (autoFixedFrustum) SetTransform();
+
+    //    // 平行光投影矩阵
+    //    Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
+    //    ShadowMatrixVP_RT = proj * cam.worldToCameraMatrix;
+
+    //    proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
+    //    ShadowMatrixVP = proj * cam.worldToCameraMatrix;
+    //    Shader.SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVP, ShadowMatrixVP);
+    //}
+
+    //private void Update()
+    //{
+    //    SceneController.instance.RenderShadow(this);
+    //}
+
+    //private void LateUpdate()
+    //{
+    //    SetCameraArgs();
+    //}
+
+    //public Matrix4x4 GetVPMatrix()
+    //{
+    //    return ShadowMatrixVP_RT;
+    //}
 
 }

@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7002941089899526597}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 53.9, y: 45, z: 0}
 --- !u!108 &7002941088626890801
 Light:
@@ -104,6 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 895a435f4a24e58478338d379e5ea28d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cascadeShadowDistances: 0a000000190000003700000064000000
 --- !u!1 &7002941088905549736
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,7 +135,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7002941089899526597}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7002941088905549739
 MonoBehaviour:
@@ -325,7 +326,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pipeline: {fileID: 7002941088905549739}
-  directionLighting: {fileID: 7002941088626890803}
+  directionLight: {fileID: 7002941088626890803}
 --- !u!1 &7002941089629179658
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,7 +343,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7002941089629179659
 Transform:
   m_ObjectHideFlags: 0
@@ -350,13 +351,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7002941089629179658}
-  m_LocalRotation: {x: 0.41871402, y: 0.34112492, z: -0.17343701, w: 0.82354844}
-  m_LocalPosition: {x: 0, y: 9.68, z: 0}
+  m_LocalRotation: {x: 0.2417238, y: 0.31859323, z: -0.1619813, w: 0.9021253}
+  m_LocalPosition: {x: 0, y: 25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7002941089899526597}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 53.9, y: 45, z: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 30, y: 45, z: 0}
 --- !u!114 &7002941089629179668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,9 +370,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25c7635658618f742afbe9761b05a78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debug: 1
+  autoFixedFrustum: 1
   resolution: 1024
-  use32BitsDepth: 1
-  farClipShadowDistance: 50
+  farClipShadowDistance: 25
+  shadowBias: 0.01
+  shadowSoftValue: 1
   mainLight: {fileID: 7002941088626890803}
 --- !u!1 &7002941089899526596
 GameObject:
@@ -401,9 +405,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7002941089495716951}
-  - {fileID: 7002941089629179659}
   - {fileID: 7002941088626890802}
   - {fileID: 7002941088905549737}
+  - {fileID: 7002941089629179659}
   - {fileID: 7002941089347321858}
   m_Father: {fileID: 0}
   m_RootOrder: 0

@@ -56,13 +56,13 @@ public class SceneController : Singleton<SceneController>
 
     public void Render(RenderTarget rt)
     {
-        frustumCulling.Render(rt, ClusterRendering.RenderType.RENDER_DEFERRED_SCENE);
+        frustumCulling.Render(rt);
         matManager.Render(rt);
 
         foreach (var key in dicRenderer.Keys)
         {
             ClusterRendering rendering = dicRenderer[key];
-            rendering.Render(rt, ClusterRendering.RenderType.RENDER_DEFERRED_SCENE);
+            rendering.Render(rt);
         }
     }
 
@@ -71,7 +71,7 @@ public class SceneController : Singleton<SceneController>
         foreach (var key in dicRenderer.Keys)
         {
             ClusterRendering shadow = dicRenderer[key];
-            shadow.Render(rt, ClusterRendering.RenderType.RENDER_SHADOW);
+            shadow.Render(rt);
         }
     }
 

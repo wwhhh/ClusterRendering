@@ -8,7 +8,7 @@ public abstract class ICommand
 
     public abstract void Init(GraphicsPipelineAsset asset);
 
-    public abstract void Render(RenderTarget rt, RenderType type = RenderType.RENDER_DEFERRED_SCENE);
+    public abstract void Render(RenderTarget rt);
 
     public abstract void Clear();
 

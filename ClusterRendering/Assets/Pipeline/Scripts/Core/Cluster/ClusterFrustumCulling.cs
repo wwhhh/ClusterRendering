@@ -47,7 +47,7 @@ public unsafe class ClusterFrustumCulling : ICommand
         frustumCulling = asset.frustumCulling;
     }
 
-    public override void Render(RenderTarget rt, RenderType type)
+    public override void Render(RenderTarget rt)
     {
         if (!bRunning) return;
 

@@ -6,7 +6,7 @@ public class GraphicsRenderTarget : RenderTarget
 {
 
     public GraphicsPipeline pipeline;
-    public GraphicsLighting directionLighting;
+    public GraphicsLight directionLight;
 
     public RenderTargetIdentifier[] gBufferIdentifier;
     public RenderTargetIdentifier depthIdentifier;
@@ -53,14 +53,12 @@ public class GraphicsRenderTarget : RenderTarget
     private void LateUpdate()
     {
         SetGlobalArgs(cam);
+        SceneController.instance.Render(this);
     }
 
-    private void Update()
+    private void OnPostRender()
     {
-        GL.Clear(true, true, Color.black);
-
-        SceneController.instance.Render(this);
-        directionLighting.Render(targetRT);
+        directionLight.Render(targetRT);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

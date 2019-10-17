@@ -47,7 +47,7 @@
 		Texture2D _GBuffer2; SamplerState sampler_GBuffer2;
 		Texture2D _GBuffer3; SamplerState sampler_GBuffer3;
 		Texture2D _DepthTexture; SamplerState sampler_DepthTexture;
-		
+
 		ENDCG
 
 		Pass
@@ -92,7 +92,7 @@
 				);
 
 				float atten = GetDirLightShadow(worldPos);
-				return color* (1 - atten);
+				return color * (1 - atten);
 			}
 
             ENDCG

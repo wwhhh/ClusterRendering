@@ -32,10 +32,11 @@ Shader "Shadow/shadowDepth"
 
 				v2f o;
 				o.pos = mul(_ShadowMatrixVPRT, float4(p.vertex, 1));
+
 				return o;
 			}
 
-			float4 frag(v2f i) : SV_Target {
+			float4 frag(v2f i) : SV_Target{
 				fixed4 r = 0;
 				r = EncodeFloatRGBA(i.pos.z);
 				return r;

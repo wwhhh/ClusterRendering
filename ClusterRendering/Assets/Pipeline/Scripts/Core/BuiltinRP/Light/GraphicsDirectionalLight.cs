@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(Light))]
-public class GraphicsDirectionalLight : GraphicsLighting
+public class GraphicsDirectionalLight : GraphicsLight
 {
 
     private Shader _lightingShader;
@@ -22,9 +22,23 @@ public class GraphicsDirectionalLight : GraphicsLighting
         }
     }
 
+    public static GraphicsDirectionalLight I = null;
+
     private void OnEnable()
     {
         _lightingShader = Shader.Find("Deferred/StandardLighting");
+
+        I = this;
+    }
+
+    private void Start()
+    {
+        CreateRenderTexture();
+    }
+
+    private void Update()
+    {
+        UpdateCameraParams();
     }
 
     /// <summary>
@@ -45,14 +59,41 @@ public class GraphicsDirectionalLight : GraphicsLighting
         Graphics.Blit(null, rt, lightingMaterial, 0);
     }
 
-    public override void FrameUpdate()
+
+    #region 阴影
+
+    [System.NonSerialized]
+    public OrthoCam shadowCamera;
+
+    [System.NonSerialized]
+    public RenderTexture[] shadowmapRTSingle;
+
+    public int[] cascadeShadowDistances;
+
+    private const int RESOLUTION = 1024;
+
+    private void CreateRenderTexture()
     {
 
+        shadowmapRTSingle = new RenderTexture[4];
+        shadowmapRTSingle[0] = new RenderTexture(RESOLUTION, RESOLUTION, 0);
+        shadowmapRTSingle[1] = new RenderTexture(RESOLUTION, RESOLUTION, 0);
+        shadowmapRTSingle[2] = new RenderTexture(RESOLUTION, RESOLUTION, 0);
+        shadowmapRTSingle[3] = new RenderTexture(RESOLUTION, RESOLUTION, 0);
+
+        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap0, shadowmapRTSingle[0]);
+        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap1, shadowmapRTSingle[1]);
+        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap2, shadowmapRTSingle[2]);
+        Shader.SetGlobalTexture(ShaderIDs.ID_Shadowmap3, shadowmapRTSingle[3]);
     }
 
-    private void Update()
+    private void UpdateCameraParams()
     {
-        
+        shadowCamera.forward = transform.forward;
+        shadowCamera.up = transform.up;
+        shadowCamera.right = transform.right;
     }
+
+    #endregion
 
 }

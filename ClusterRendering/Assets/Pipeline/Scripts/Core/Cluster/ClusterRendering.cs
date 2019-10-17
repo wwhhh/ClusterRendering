@@ -4,12 +4,6 @@ using static ClusterComponents;
 
 public unsafe class ClusterRendering : ICommand, ISceneComponent
 {
-    public enum RenderType
-    {
-        RENDER_DEFERRED_SCENE,
-        RENDER_SHADOW,
-    }
-
     GraphicsPipelineAsset asset;
 
     int instanceCount;
@@ -22,10 +16,11 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
 
     string sceneName;
     bool bRunning;
-    bool enableShadow;
 
     CommandBuffer drawCmd;
-    CommandBuffer shadowCmd;
+    CommandBuffer[] shadowCmds;
+
+    CascadeShadowmap cascade;
 
     public ClusterRendering()
     {
@@ -44,6 +39,7 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
         ParseSceneData(sceneName);
         CreateBuffers();
 
+        cascade = new CascadeShadowmap();
         bRunning = true;
     }
 
@@ -53,31 +49,48 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
         bRunning = false;
     }
 
-    public override void Render(RenderTarget rt, RenderType type)
+    public override void Render(RenderTarget rt)
     {
         if (!bRunning) return;
         Camera camera = rt.cam;
 
+        GraphicsDirectionalLight light = GraphicsDirectionalLight.I;
+        int cascadeCount = light.cascadeShadowDistances.Length;
+
         Shader.SetGlobalBuffer(ShaderIDs.ID_VertexBuffer, pointsBuffer);
-        // 材质参数设置
-        if (type == RenderType.RENDER_SHADOW)
+
+        if (asset.enableShadow) // 阴影绘制
         {
-            if (shadowCmd == null)
+
+            cascade.camera = camera;
+            cascade.shadowCam = light.shadowCamera;
+            cascade.ShadowDistances = light.cascadeShadowDistances;
+
+            if (shadowCmds == null)
             {
-                GraphicsShadowRenderTarget shadowRenderTarget = rt as GraphicsShadowRenderTarget;
-                CreateShadowCmd(shadowRenderTarget);
+                shadowCmds = new CommandBuffer[cascadeCount];
+            }
+
+            for (int i = 0; i < cascadeCount; i++)
+            {
+                if (shadowCmds[i] == null)
+                {
+                    shadowCmds[i] = CreateShadowCmd(light, i);
+                }
+                shadowCmds[i].SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVPRT, cascade.Execute(i));
             }
         }
-        else
-        {
-            if (drawCmd == null)
-            {
-                if (shadowCmd != null) camera.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, shadowCmd);
 
-                GraphicsRenderTarget renderTarget = rt as GraphicsRenderTarget;
-                CreateDrawCmd(renderTarget);
-                camera.AddCommandBuffer(CameraEvent.AfterForwardOpaque, drawCmd);
+        if (drawCmd == null) // Cluster场景绘制
+        {
+            if (shadowCmds != null && shadowCmds.Length == cascadeCount)
+            {
+                for (int i = 0; i < shadowCmds.Length; i++) camera.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, shadowCmds[i]);
             }
+
+            GraphicsRenderTarget renderTarget = rt as GraphicsRenderTarget;
+            CreateDrawCmd(renderTarget);
+            camera.AddCommandBuffer(CameraEvent.AfterForwardOpaque, drawCmd);
         }
     }
 
@@ -106,13 +119,14 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
         pointsBuffer.SetData(points);
     }
 
-    void CreateShadowCmd(GraphicsShadowRenderTarget rt)
+    CommandBuffer CreateShadowCmd(GraphicsDirectionalLight light, int pass)
     {
-        if (!asset.enableShadow) return;
-        shadowCmd = CommandBufferPool.Get("DrawProceduralIndirect: Draw Shadow");
-        shadowCmd.SetRenderTarget(rt.shadowmapIdentifier);
+        CommandBuffer shadowCmd = CommandBufferPool.Get("DrawProceduralIndirect: Draw Shadow " + pass);
+        //shadowCmd.SetRenderTarget(rt.shadowmapRT, 4, CubemapFace.Unknown, pass);
+        shadowCmd.SetRenderTarget(light.shadowmapRTSingle[pass]);
         shadowCmd.ClearRenderTarget(true, true, Color.black);
         shadowCmd.DrawProceduralIndirect(Matrix4x4.identity, asset.shadowMaterial, 0, MeshTopology.Triangles, argsBuffer);
+        return shadowCmd;
     }
 
     void CreateDrawCmd(GraphicsRenderTarget rt)
@@ -142,7 +156,7 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
         ReleaseNative();
         ReleaseBuffers();
 
-        CommandBufferPool.Release(shadowCmd);
+        foreach (var cmd in shadowCmds) CommandBufferPool.Release(cmd);
         CommandBufferPool.Release(drawCmd);
     }
 
