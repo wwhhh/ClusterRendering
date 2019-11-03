@@ -70,7 +70,6 @@
 				float4 ndcpos = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, depth * 2 - 1, 1);
 #endif
 				float4 worldPos = mul(_InvVP, ndcpos);
-				//worldPos.xyz  /= worldPos.w;
 
 				UnityStandardData data = UnityStandardDataFromGbuffer(gbuffer0, gbuffer1, gbuffer2);
 				float3 eyeVec = normalize(worldPos.xyz - _WorldSpaceCameraPos);
@@ -92,7 +91,7 @@
 				);
 
 				float atten = GetDirLightShadow(worldPos);
-				return color * (1 - atten);
+				return color;
 			}
 
             ENDCG

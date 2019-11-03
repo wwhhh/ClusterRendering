@@ -10,6 +10,8 @@ public class ClusterComponents
     public const string PATH_MATERIAL = "material_";
     public const string PATH_TEX_TEXTURE = "tex_";
     public const string PATH_TEX_NORMAL = "normal_";
+    public const string PATH_TEX = "/Textures/";
+    public const string PATH_TEX_BYTES = "/tex_bytes/";
 
     public const int KERNEL_FRUSTUM_CULLING = 0;
 }

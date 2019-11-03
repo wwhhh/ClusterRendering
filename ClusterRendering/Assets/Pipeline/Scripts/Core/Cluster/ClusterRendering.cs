@@ -20,8 +20,6 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
     CommandBuffer drawCmd;
     CommandBuffer[] shadowCmds;
 
-    CascadeShadowmap cascade;
-
     public ClusterRendering()
     {
     }
@@ -39,7 +37,6 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
         ParseSceneData(sceneName);
         CreateBuffers();
 
-        cascade = new CascadeShadowmap();
         bRunning = true;
     }
 
@@ -53,39 +50,20 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
     {
         if (!bRunning) return;
         Camera camera = rt.cam;
-
-        GraphicsDirectionalLight light = GraphicsDirectionalLight.I;
-        int cascadeCount = light.cascadeShadowDistances.Length;
+        int cascadeCount = 1;
 
         Shader.SetGlobalBuffer(ShaderIDs.ID_VertexBuffer, pointsBuffer);
-
         if (asset.enableShadow) // 阴影绘制
         {
 
-            cascade.camera = camera;
-            cascade.shadowCam = light.shadowCamera;
-            cascade.ShadowDistances = light.cascadeShadowDistances;
-
-            if (shadowCmds == null)
-            {
-                shadowCmds = new CommandBuffer[cascadeCount];
-            }
-
-            for (int i = 0; i < cascadeCount; i++)
-            {
-                if (shadowCmds[i] == null)
-                {
-                    shadowCmds[i] = CreateShadowCmd(light, i);
-                }
-                shadowCmds[i].SetGlobalMatrix(ShaderIDs.ID_ShadowMatrixVPRT, cascade.Execute(i));
-            }
         }
 
         if (drawCmd == null) // Cluster场景绘制
         {
             if (shadowCmds != null && shadowCmds.Length == cascadeCount)
             {
-                for (int i = 0; i < shadowCmds.Length; i++) camera.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, shadowCmds[i]);
+                for (int i = 0; i < shadowCmds.Length; i++)
+                    camera.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, shadowCmds[i]);
             }
 
             GraphicsRenderTarget renderTarget = rt as GraphicsRenderTarget;
@@ -121,12 +99,7 @@ public unsafe class ClusterRendering : ICommand, ISceneComponent
 
     CommandBuffer CreateShadowCmd(GraphicsDirectionalLight light, int pass)
     {
-        CommandBuffer shadowCmd = CommandBufferPool.Get("DrawProceduralIndirect: Draw Shadow " + pass);
-        //shadowCmd.SetRenderTarget(rt.shadowmapRT, 4, CubemapFace.Unknown, pass);
-        shadowCmd.SetRenderTarget(light.shadowmapRTSingle[pass]);
-        shadowCmd.ClearRenderTarget(true, true, Color.black);
-        shadowCmd.DrawProceduralIndirect(Matrix4x4.identity, asset.shadowMaterial, 0, MeshTopology.Triangles, argsBuffer);
-        return shadowCmd;
+        return null;
     }
 
     void CreateDrawCmd(GraphicsRenderTarget rt)

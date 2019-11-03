@@ -22,6 +22,9 @@ public unsafe class VirtualMaterial
         var dict = new Dictionary<Material, int>();
         allNames = new List<string>();
         allProperties = new List<MaterialProperties>();
+        albedoIDs = new List<int>();
+        albedoNames = new List<string>();
+
         var albedoTexs = new List<Texture>();
         var normalTexs = new List<Texture>();
         var albedoDict = new Dictionary<Texture, int>();
@@ -65,16 +68,23 @@ public unsafe class VirtualMaterial
                         _AlbedoTex = albedoIdx,
                         _NormalTex = normalIdx
                     };
+
                     allProperties.Add(property);
+
+                    if (albedoIdx > 0 && !albedoIDs.Contains(albedoIdx))
+                    {
+                        albedoIDs.Add(albedoIdx);
+                        albedoNames.Add(albedo.name);
+                    }
 
                     len++;
                 }
             }
         }
 
-        TextureProcess = Resources.Load<ComputeShader>("TextureProcessor");
-        WriteToFile(out albedoGUIDs, albedoTexs, 0, textureSavePath);
-        WriteToFile(out normalGUIDs, normalTexs, 1, textureSavePath);
+        //TextureProcess = Resources.Load<ComputeShader>("TextureProcessor");
+        //WriteToFile(out albedoGUIDs, albedoTexs, 0, textureSavePath);
+        //WriteToFile(out normalGUIDs, normalTexs, 1, textureSavePath);
 
         return dict;
     }
@@ -99,7 +109,7 @@ public unsafe class VirtualMaterial
             float4[] resultDatas = new float4[floatBuffer.count];
             floatBuffer.GetData(resultDatas);
 
-            string savePath = path + "/TexBytes/";
+            string savePath = path + ClusterComponents.PATH_TEX_BYTES;
             ClusterUtils.CheckPath(savePath);
             savePath += strs[i] + ".bytes";
 
@@ -135,6 +145,10 @@ public unsafe class VirtualMaterial
     #region RUNTIME
     public string[] albedoGUIDs;
     public string[] normalGUIDs;
+    public List<int> albedoIDs;
+    public List<string> albedoNames;
+    public int[] normalIDs;
+    public int[] normalNames;
     public List<MaterialProperties> allProperties;
     public List<string> allNames;
     #endregion

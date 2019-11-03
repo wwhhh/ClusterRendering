@@ -28,6 +28,13 @@ public unsafe struct VirtualMaterialManager
         _properties = vm.allProperties.ToArray();
         _perprotiesBuffer = new ComputeBuffer(_properties.Length, sizeof(MaterialProperties));
         _perprotiesBuffer.SetData(_properties);
+
+        for (int i = 0; i < vm.albedoIDs.Count; i++)
+        {
+            string texPath = "Scenes/" + name + ClusterComponents.PATH_TEX + vm.albedoNames[i];
+            Texture texture = ResourceManager.instance.Load<Texture>(texPath);
+            Shader.SetGlobalTexture(vm.albedoIDs[i].ToString(), texture);
+        }
     }
 
     public void Render(RenderTarget rt)

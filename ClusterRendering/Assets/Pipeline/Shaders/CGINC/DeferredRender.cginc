@@ -239,7 +239,7 @@ FragmentOutput frag_deferredLighting(Interpolators i)
 	output.outEmission.rgb = GetEmission(i);
 	output.outEmission.a = 1;
 #else
-	output.color = float4(0.1, 0, 0, 1);
+	output.color = float4(1, 0, 0, 1);
 #endif
 	return output;
 }

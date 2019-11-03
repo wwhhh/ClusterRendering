@@ -7,3 +7,6 @@ ClusterRendering/Assembly-CSharp.csproj
 ClusterRendering/Assembly-CSharp-Editor.csproj
 ClusterRendering/ClusterRendering.sln
 ClusterRendering/obj/
+ClusterRendering/Assets/AssetStoreOriginals/
+ClusterRendering/Assets/CrashScene/
+ClusterRendering/Assets/CrashScene.meta
